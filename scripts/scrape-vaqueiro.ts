@@ -104,6 +104,19 @@ async function fetchHtml(url: string): Promise<string | null> {
   }
 }
 
+async function fetchImageBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; recipe-scraper/1.0)" },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 function mapUnit(raw: string): string {
   const u = raw.toLowerCase().trim();
   const map: Record<string, string> = {
@@ -330,6 +343,24 @@ async function main() {
         if (!data) {
           failed++;
           continue;
+        }
+
+        if (!DRY_RUN) {
+          const imgBuffer = await fetchImageBuffer((data.thumbnail as { url: string }).url);
+          if (!imgBuffer) {
+            console.log(`   ⚠️  Image download failed for ${data.title}, skipping`);
+            failed++;
+            continue;
+          }
+          const { uploadImage } = await import("../src/lib/cloudinary.js");
+          try {
+            const uploaded = await uploadImage(imgBuffer, "super-chef/recipes/vaqueiro");
+            (data as Record<string, unknown>).thumbnail = { url: uploaded.url, publicId: uploaded.publicId };
+          } catch {
+            console.log(`   ⚠️  Cloudinary upload failed for ${data.title}, skipping`);
+            failed++;
+            continue;
+          }
         }
 
         if (DRY_RUN) {
