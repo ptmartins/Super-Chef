@@ -7,6 +7,7 @@ export const generateMenuSchema = z.object({
   mealsPerDay: z
     .array(z.enum(["breakfast", "lunch", "dinner"]))
     .min(1, "Select at least one meal per day"),
+  recipeSource: z.enum(["all", "favorites"]).optional(),
   filters: z
     .object({
       categories: z.array(z.string()).optional(),

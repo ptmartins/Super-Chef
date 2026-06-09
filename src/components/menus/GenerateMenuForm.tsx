@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Loader2, Sparkles } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Loader2, Sparkles, BookOpen, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,9 +24,11 @@ const MENU_TYPES = [
 export function GenerateMenuForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const { data: session } = useSession();
   const [isGenerating, setIsGenerating] = useState(false);
   const [filterMaxTime, setFilterMaxTime] = useState(180);
   const [filterCategories, setFilterCategories] = useState<string[]>([]);
+  const [recipeSource, setRecipeSource] = useState<"all" | "favorites">("all");
 
   const { register, control, handleSubmit, watch, formState: { errors } } = useForm<GenerateMenuFormData>({
     resolver: zodResolver(generateMenuSchema),
@@ -44,6 +47,7 @@ export function GenerateMenuForm() {
     try {
       const payload = {
         ...data,
+        recipeSource,
         filters: {
           ...(filterMaxTime < 180 ? { maxTime: filterMaxTime } : {}),
           ...(filterCategories.length > 0 ? { categories: filterCategories } : {}),
@@ -143,6 +147,49 @@ export function GenerateMenuForm() {
           )}
         />
         {errors.mealsPerDay && <p className="text-xs text-destructive">{errors.mealsPerDay.message}</p>}
+      </div>
+
+      {/* Recipe source */}
+      <div className="space-y-2">
+        <Label>Recipe source</Label>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setRecipeSource("all")}
+            className={cn(
+              "rounded-xl border-2 p-4 text-left transition-all flex items-start gap-3",
+              recipeSource === "all"
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-primary/40 hover:bg-muted"
+            )}
+          >
+            <BookOpen className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
+            <div>
+              <div className="font-semibold text-sm">All recipes</div>
+              <div className="text-xs text-muted-foreground mt-0.5">Pick from the full collection</div>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => session ? setRecipeSource("favorites") : undefined}
+            disabled={!session}
+            className={cn(
+              "rounded-xl border-2 p-4 text-left transition-all flex items-start gap-3",
+              !session && "opacity-50 cursor-not-allowed",
+              recipeSource === "favorites" && session
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-primary/40 hover:bg-muted"
+            )}
+          >
+            <Heart className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
+            <div>
+              <div className="font-semibold text-sm">My favorites</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {session ? "Only my saved recipes" : "Sign in to use"}
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Optional filters */}

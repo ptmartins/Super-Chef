@@ -5,7 +5,10 @@
       "Bash(git commit -m ' *)",
       "WebFetch(domain:www.vaqueiro.pt)",
       "Bash(DRY_RUN=1 LIMIT=8 npx ts-node --project tsconfig.json scripts/scrape-vaqueiro.ts)",
-      "Bash(npx ts-node *)"
+      "Bash(npx ts-node *)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\WEB_DEV\\\\savori\\\\src\" -Recurse -File | Where-Object {$_.Name -match \"password|reset|verify|confirm|forgot\"} | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\WEB_DEV\\\\savori\\\\src\" -Recurse -File | Where-Object {$_.Extension -eq \".ts\" -or $_.Extension -eq \".tsx\"} | Select-Object -ExpandProperty FullName)",
+      "Bash(npm install *)"
     ]
   }
 }

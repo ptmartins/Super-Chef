@@ -6,10 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed": "npx ts-node --project tsconfig.json -e \"require('./scripts/seed').seed()\"",
-    "scrape": "npx ts-node --project tsconfig.json scripts/scrape-vaqueiro.ts",
-    "migrate-images": "npx ts-node --project tsconfig.json scripts/migrate-vaqueiro-images.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -41,6 +38,7 @@
     "next": "15.2.6",
     "next-auth": "^5.0.0-beta.30",
     "next-themes": "^0.4.4",
+    "nodemailer": "^7.0.13",
     "react": "^19.0.0",
     "react-day-picker": "^9.4.4",
     "react-dom": "^19.0.0",
@@ -56,6 +54,7 @@
     "@types/busboy": "^1.5.4",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.0.1",

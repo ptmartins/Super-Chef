@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
+import User from "@/models/User";
+import { auth } from "@/lib/auth";
 import type { IRecipe } from "@/types";
 import { RecipeGrid } from "@/components/recipes/RecipeGrid";
 import { RecipeFilters } from "@/components/recipes/RecipeFilters";
@@ -25,10 +27,14 @@ interface PageProps {
     page?: string;
     sortBy?: string;
     sortOrder?: string;
+    view?: string;
   }>;
 }
 
-async function fetchRecipes(params: Awaited<PageProps["searchParams"]>) {
+async function fetchRecipes(
+  params: Awaited<PageProps["searchParams"]>,
+  favoritedIds: Set<string>
+) {
   await connectDB();
 
   const search = params.search ?? "";
@@ -41,6 +47,7 @@ async function fetchRecipes(params: Awaited<PageProps["searchParams"]>) {
   const limit = 12;
   const sortBy = params.sortBy ?? "createdAt";
   const sortOrder = params.sortOrder === "asc" ? 1 : -1;
+  const view = params.view ?? "all";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const query: Record<string, any> = {};
@@ -50,6 +57,13 @@ async function fetchRecipes(params: Awaited<PageProps["searchParams"]>) {
   if (maxTime) query.estimatedTime = { $lte: parseInt(maxTime, 10) };
   if (tags) query.tags = { $in: tags.split(",").map((t) => t.trim()) };
   if (suitableFor) query.suitableFor = { $in: [suitableFor] };
+
+  if (view === "favorites") {
+    if (favoritedIds.size === 0) {
+      return { recipes: [] as IRecipe[], total: 0, page: 1, totalPages: 0 };
+    }
+    query._id = { $in: Array.from(favoritedIds) };
+  }
 
   const [recipes, total] = await Promise.all([
     Recipe.find(query)
@@ -70,17 +84,37 @@ async function fetchRecipes(params: Awaited<PageProps["searchParams"]>) {
 
 export default async function RecipesPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const { recipes, total, page, totalPages } = await fetchRecipes(params);
+  const session = await auth();
+  const view = params.view ?? "all";
+
+  await connectDB();
+
+  let favoritedIds = new Set<string>();
+  if (session?.user) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = await User.findById(session.user.id).select("favorites").lean() as any;
+    favoritedIds = new Set<string>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (user?.favorites ?? []).map((id: any) => id.toString())
+    );
+  }
+
+  const { recipes, total, page, totalPages } = await fetchRecipes(params, favoritedIds);
+
+  const isFavoritesView = view === "favorites";
+  const headerDescription = isFavoritesView
+    ? total > 0 ? `${total} saved recipe${total !== 1 ? "s" : ""}` : "No favorites yet"
+    : total > 0 ? `${total} recipe${total !== 1 ? "s" : ""} in your collection` : "Start building your recipe collection";
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-display font-bold">Recipes</h1>
-          <p className="text-muted-foreground mt-1">
-            {total > 0 ? `${total} recipe${total !== 1 ? "s" : ""} in your collection` : "Start building your recipe collection"}
-          </p>
+          <h1 className="text-3xl font-display font-bold">
+            {isFavoritesView ? "My Favorites" : "Recipes"}
+          </h1>
+          <p className="text-muted-foreground mt-1">{headerDescription}</p>
         </div>
         <Button asChild>
           <Link href="/recipes/new">
@@ -104,7 +138,11 @@ export default async function RecipesPage({ searchParams }: PageProps) {
         {/* Main content */}
         <div className="flex-1 min-w-0 space-y-6">
           <Suspense fallback={<RecipeGridSkeleton />}>
-            <RecipeGrid recipes={recipes} />
+            <RecipeGrid
+              recipes={recipes}
+              favoritedIds={session?.user ? favoritedIds : undefined}
+              view={view}
+            />
           </Suspense>
           <Suspense>
             <RecipePagination page={page} totalPages={totalPages} total={total} />

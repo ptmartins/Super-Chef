@@ -5,13 +5,15 @@ import { Clock, Users, ChefHat } from "lucide-react";
 import { motion } from "framer-motion";
 import type { IRecipe } from "@/types";
 import { formatTime, getDifficultyColor, getCategoryColor, cn } from "@/lib/utils";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface RecipeCardProps {
   recipe: IRecipe;
   index?: number;
+  isFavorited?: boolean;
 }
 
-export function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
+export function RecipeCard({ recipe, index = 0, isFavorited }: RecipeCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -29,7 +31,11 @@ export function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
-            {/* Difficulty badge overlay */}
+            {/* Favorite button — top left (only for authenticated users) */}
+            {isFavorited !== undefined && (
+              <FavoriteButton recipeId={recipe._id} initialFavorited={isFavorited} />
+            )}
+            {/* Difficulty badge — top right */}
             <div className="absolute top-3 right-3">
               <span className={cn(
                 "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border backdrop-blur-sm bg-white/90",

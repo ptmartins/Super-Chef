@@ -13,6 +13,7 @@ interface GenerateMenuOptions {
     difficulty?: string[];
     tags?: string[];
   };
+  favoriteIds?: string[];
 }
 
 function fisherYates<T>(arr: T[]): T[] {
@@ -28,7 +29,7 @@ export async function generateMenuDays(options: GenerateMenuOptions): Promise<{
   days: MenuDay[];
   shoppingList: ReturnType<typeof aggregateIngredients>;
 }> {
-  const { type, startDate, mealsPerDay, filters } = options;
+  const { type, startDate, mealsPerDay, filters, favoriteIds } = options;
   const numDays = getMenuDays(type);
 
   // Build base query filters
@@ -38,6 +39,7 @@ export async function generateMenuDays(options: GenerateMenuOptions): Promise<{
   if (filters?.maxTime) baseFilter.estimatedTime = { $lte: filters.maxTime };
   if (filters?.difficulty?.length) baseFilter.difficulty = { $in: filters.difficulty };
   if (filters?.tags?.length) baseFilter.tags = { $in: filters.tags };
+  if (favoriteIds?.length) baseFilter._id = { $in: favoriteIds };
 
   // Fetch recipe pools per meal type
   const pools: Record<MealType, IRecipe[]> = {

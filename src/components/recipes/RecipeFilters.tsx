@@ -1,7 +1,8 @@
 "use client";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Search, SlidersHorizontal, X, Heart, BookOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, type Category } from "@/types";
@@ -13,11 +14,13 @@ export function RecipeFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const { data: session } = useSession();
 
   const search = searchParams.get("search") ?? "";
   const category = searchParams.get("category") ?? "";
   const difficulty = searchParams.get("difficulty") ?? "";
   const maxTime = parseInt(searchParams.get("maxTime") ?? "180", 10);
+  const view = searchParams.get("view") ?? "all";
 
   const updateParam = useCallback(
     (key: string, value: string | null) => {
@@ -41,6 +44,36 @@ export function RecipeFilters() {
 
   return (
     <div className="space-y-5">
+      {/* View toggle — only for authenticated users */}
+      {session && (
+        <div className="flex rounded-xl border overflow-hidden text-xs font-medium">
+          <button
+            onClick={() => updateParam("view", null)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-2 transition-colors",
+              view !== "favorites"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted text-muted-foreground"
+            )}
+          >
+            <BookOpen className="h-3 w-3" />
+            All
+          </button>
+          <button
+            onClick={() => updateParam("view", "favorites")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-2 transition-colors",
+              view === "favorites"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted text-muted-foreground"
+            )}
+          >
+            <Heart className="h-3 w-3" />
+            My Favorites
+          </button>
+        </div>
+      )}
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

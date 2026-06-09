@@ -5,6 +5,9 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  favorites?: string[];
+  resetToken?: string;
+  resetTokenExpiry?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,6 +25,9 @@ const UserSchema = new Schema<UserDocument>(
       trim: true,
     },
     password: { type: String, required: true },
+    favorites: [{ type: Schema.Types.ObjectId, ref: "Recipe" }],
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
   },
   { timestamps: true }
 );

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
+import User from "@/models/User";
 import { generateMenuDays } from "@/lib/generateMenu";
 import { generateMenuSchema } from "@/lib/validations/menu.schema";
 import { getMenuDays } from "@/lib/utils";
@@ -17,11 +19,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ errors: parsed.error.errors }, { status: 400 });
     }
 
-    const { name, type, startDate: startDateStr, mealsPerDay, filters } = parsed.data;
+    const { name, type, startDate: startDateStr, mealsPerDay, filters, recipeSource } = parsed.data;
 
     const startDate = new Date(startDateStr);
     if (isNaN(startDate.getTime())) {
       return NextResponse.json({ error: "Invalid start date" }, { status: 400 });
+    }
+
+    // Resolve favorite IDs when source is "favorites"
+    let favoriteIds: string[] | undefined;
+    if (recipeSource === "favorites") {
+      const session = await auth();
+      if (!session?.user) {
+        return NextResponse.json({ error: "Sign in to generate a menu from your favorites" }, { status: 401 });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const user = await User.findById(session.user.id).select("favorites").lean() as any;
+      const ids: string[] = (user?.favorites ?? []).map((id: any) => id.toString());
+      if (ids.length === 0) {
+        return NextResponse.json(
+          { error: "You have no favorite recipes yet. Heart some recipes first." },
+          { status: 400 }
+        );
+      }
+      favoriteIds = ids;
     }
 
     const numDays = getMenuDays(type);
@@ -33,6 +54,7 @@ export async function POST(req: NextRequest) {
       startDate,
       mealsPerDay,
       filters,
+      favoriteIds,
     });
 
     const menu = await Menu.create({
