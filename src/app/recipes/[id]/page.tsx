@@ -39,6 +39,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
   const raw = await Recipe.findById(id).populate("author", "name").lean();
   if (!raw) notFound();
   const recipe: IRecipe = localizeRecipe(JSON.parse(JSON.stringify(raw)), locale);
+  const isOwner = isLoggedIn && recipe.author?._id?.toString() === session!.user.id;
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
@@ -80,8 +81,8 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             <p className="mt-3 text-muted-foreground leading-relaxed">{recipe.description}</p>
           </div>
 
-          {/* Actions — only visible when logged in */}
-          {isLoggedIn && (
+          {/* Actions — only visible to the recipe owner */}
+          {isOwner && (
             <div className="flex gap-2 shrink-0">
               <Button asChild variant="outline" size="sm">
                 <Link href={`/recipes/${id}/edit`}>

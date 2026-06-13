@@ -28,6 +28,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const existing = await Recipe.findById(id);
   if (!existing) return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+  if (existing.author?.toString() !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     const body = await req.json();
@@ -71,6 +74,9 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const recipe = await Recipe.findById(id);
   if (!recipe) return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+  if (recipe.author?.toString() !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     await Menu.updateMany({}, { $pull: { "days.$[].meals": { recipeId: id } } });
