@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { getT, type Locale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: {
@@ -15,22 +18,28 @@ export const metadata: Metadata = {
   keywords: ["recipes", "meal planning", "menu planner", "cooking", "food"],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
+  const t = getT(locale);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
           <SessionProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <footer className="border-t py-6 mt-auto">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <p className="text-center text-sm text-muted-foreground">
-                  © {new Date().getFullYear()} Super Chef. Crafted with love for food lovers.
-                </p>
-              </div>
-            </footer>
-            <Toaster />
+            <LanguageProvider initialLocale={locale}>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <footer className="border-t py-6 mt-auto">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <p className="text-center text-sm text-muted-foreground">
+                    © {new Date().getFullYear()} Super Chef. {t("home.footer")}
+                  </p>
+                </div>
+              </footer>
+              <Toaster />
+            </LanguageProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

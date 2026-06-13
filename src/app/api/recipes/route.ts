@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { thumbnailUrl, thumbnailPublicId, ...rest } = body;
+    const { thumbnailUrl, thumbnailPublicId, translations, ...rest } = body;
 
     if (!thumbnailUrl || !thumbnailPublicId) {
       return NextResponse.json({ error: "Thumbnail is required" }, { status: 400 });
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       thumbnail: { url: thumbnailUrl, publicId: thumbnailPublicId },
       slug,
       author: session.user.id,
+      ...(translations && { translations }),
     });
 
     await User.updateOne(

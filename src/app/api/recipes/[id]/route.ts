@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const body = await req.json();
-    const { thumbnailUrl, thumbnailPublicId, ...rest } = body;
+    const { thumbnailUrl, thumbnailPublicId, translations, ...rest } = body;
 
     const parsed = recipeSchema.safeParse(rest);
     if (!parsed.success) {
@@ -40,6 +40,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const update: Record<string, any> = { ...parsed.data };
+
+    if (translations !== undefined) {
+      update.translations = translations;
+    }
 
     // Only update thumbnail if a new one was uploaded
     if (thumbnailUrl && thumbnailPublicId) {

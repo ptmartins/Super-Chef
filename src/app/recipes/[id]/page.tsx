@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { Clock, Users, ChefHat, Edit3, ChevronLeft } from "lucide-react";
 import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
@@ -10,6 +11,7 @@ import { formatTime, getDifficultyColor, getCategoryColor, cn } from "@/lib/util
 import { Button } from "@/components/ui/button";
 import { DeleteRecipeButton } from "./DeleteRecipeButton";
 import { auth } from "@/lib/auth";
+import { getT, localizeRecipe, type Locale } from "@/lib/i18n";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -28,13 +30,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function RecipeDetailPage({ params }: PageProps) {
-  const [{ id }, session] = await Promise.all([params, auth()]);
+  const [{ id }, session, cookieStore] = await Promise.all([params, auth(), cookies()]);
   const isLoggedIn = !!session?.user;
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
+  const t = getT(locale);
 
   await connectDB();
   const raw = await Recipe.findById(id).populate("author", "name").lean();
   if (!raw) notFound();
-  const recipe: IRecipe = JSON.parse(JSON.stringify(raw));
+  const recipe: IRecipe = localizeRecipe(JSON.parse(JSON.stringify(raw)), locale);
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
@@ -42,7 +46,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
       <Button asChild variant="ghost" size="sm" className="mb-6 -ml-2">
         <Link href="/recipes">
           <ChevronLeft className="h-4 w-4 mr-1" />
-          All recipes
+          {t("recipe.allRecipes")}
         </Link>
       </Button>
 
@@ -71,7 +75,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-bold">{recipe.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              By {recipe.author?.name ?? "System"}
+              {t("recipe.by")} {recipe.author?.name ?? t("recipes.system")}
             </p>
             <p className="mt-3 text-muted-foreground leading-relaxed">{recipe.description}</p>
           </div>
@@ -82,7 +86,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
               <Button asChild variant="outline" size="sm">
                 <Link href={`/recipes/${id}/edit`}>
                   <Edit3 className="h-4 w-4 mr-1" />
-                  Edit
+                  {t("recipe.edit")}
                 </Link>
               </Button>
               <DeleteRecipeButton recipeId={id} />
@@ -95,29 +99,29 @@ export default async function RecipeDetailPage({ params }: PageProps) {
           <div className="rounded-2xl border bg-card p-4 text-center">
             <Clock className="h-5 w-5 text-primary mx-auto mb-1" />
             <p className="font-semibold">{formatTime(recipe.estimatedTime)}</p>
-            <p className="text-xs text-muted-foreground">Total time</p>
+            <p className="text-xs text-muted-foreground">{t("recipe.totalTime")}</p>
           </div>
           <div className="rounded-2xl border bg-card p-4 text-center">
             <Users className="h-5 w-5 text-primary mx-auto mb-1" />
             <p className="font-semibold">{recipe.servings}</p>
-            <p className="text-xs text-muted-foreground">Servings</p>
+            <p className="text-xs text-muted-foreground">{t("recipe.servings")}</p>
           </div>
           <div className="rounded-2xl border bg-card p-4 text-center">
             <ChefHat className="h-5 w-5 text-primary mx-auto mb-1" />
             <p className={cn("font-semibold capitalize", getDifficultyColor(recipe.difficulty).split(" ")[0])}>
-              {recipe.difficulty}
+              {t(`difficulty.${recipe.difficulty}`)}
             </p>
-            <p className="text-xs text-muted-foreground">Difficulty</p>
+            <p className="text-xs text-muted-foreground">{t("recipe.difficulty")}</p>
           </div>
         </div>
 
         {/* Suitable for */}
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Suitable for</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{t("recipe.suitableFor")}</p>
           <div className="flex gap-2">
             {recipe.suitableFor.map((meal) => (
               <span key={meal} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
-                {meal}
+                {t(`meal.${meal}`)}
               </span>
             ))}
           </div>
@@ -126,7 +130,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         {/* Tags */}
         {recipe.tags.length > 0 && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Tags</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{t("recipe.tags")}</p>
             <div className="flex flex-wrap gap-1.5">
               {recipe.tags.map((tag) => (
                 <span key={tag} className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs">
@@ -140,7 +144,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         <div className="grid md:grid-cols-5 gap-8">
           {/* Ingredients */}
           <div className="md:col-span-2">
-            <h2 className="text-xl font-display font-semibold mb-4">Ingredients</h2>
+            <h2 className="text-xl font-display font-semibold mb-4">{t("recipe.ingredients")}</h2>
             <div className="rounded-2xl border bg-card p-4 space-y-2">
               {recipe.ingredients.map((ing, i) => (
                 <div key={i} className="flex items-center gap-3 py-2 border-b last:border-0">
@@ -156,7 +160,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
 
           {/* Steps */}
           <div className="md:col-span-3">
-            <h2 className="text-xl font-display font-semibold mb-4">Preparation</h2>
+            <h2 className="text-xl font-display font-semibold mb-4">{t("recipe.preparation")}</h2>
             <div className="space-y-4">
               {recipe.steps
                 .sort((a, b) => a.order - b.order)

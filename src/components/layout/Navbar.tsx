@@ -8,11 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-
-const links = [
-  { href: "/recipes", label: "Recipes", icon: BookOpen },
-  { href: "/menus", label: "Menus", icon: CalendarDays },
-];
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -20,6 +17,12 @@ export function Navbar() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
   const { resolvedTheme, setTheme } = useTheme();
+  const t = useTranslation();
+
+  const links = [
+    { href: "/recipes", label: t("nav.recipes"), icon: BookOpen },
+    { href: "/menus", label: t("nav.menus"), icon: CalendarDays },
+  ];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,7 +62,7 @@ export function Navbar() {
                   href="/recipes/new"
                   className="ml-2 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
                 >
-                  + New Recipe
+                  {t("nav.newRecipe")}
                 </Link>
                 <div className="ml-2 flex items-center gap-2 pl-2 border-l border-border">
                   <span className="text-sm text-muted-foreground max-w-[120px] truncate">
@@ -72,7 +75,7 @@ export function Navbar() {
                     className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign out
+                    {t("nav.signOut")}
                   </Button>
                 </div>
               </>
@@ -83,36 +86,41 @@ export function Navbar() {
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 >
                   <LogIn className="h-4 w-4" />
-                  Sign in
+                  {t("nav.signIn")}
                 </Link>
                 <Link
                   href="/auth/register"
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
                 >
                   <UserPlus className="h-4 w-4" />
-                  Register
+                  {t("nav.register")}
                 </Link>
               </div>
             )}
           </nav>
 
-          {/* Theme toggle */}
-          <button
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className="flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
-            aria-label="Toggle theme"
-          >
-            {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+          {/* Right controls */}
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="md:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+            {/* Theme toggle */}
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
+              aria-label={t("nav.toggleTheme")}
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setOpen(!open)}
+              className="md:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
+              aria-label={t("nav.toggleMenu")}
+            >
+              {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -150,7 +158,7 @@ export function Navbar() {
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mt-1"
                   >
-                    + New Recipe
+                    {t("nav.newRecipe")}
                   </Link>
                   <div className="mt-2 pt-2 border-t border-border/40 flex items-center justify-between px-2">
                     <span className="text-sm text-muted-foreground truncate max-w-[160px]">
@@ -164,7 +172,7 @@ export function Navbar() {
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
-                      Sign out
+                      {t("nav.signOut")}
                     </button>
                   </div>
                 </>
@@ -176,7 +184,7 @@ export function Navbar() {
                     className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >
                     <LogIn className="h-4 w-4" />
-                    Sign in
+                    {t("nav.signIn")}
                   </Link>
                   <Link
                     href="/auth/register"
@@ -184,7 +192,7 @@ export function Navbar() {
                     className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     <UserPlus className="h-4 w-4" />
-                    Register
+                    {t("nav.register")}
                   </Link>
                 </div>
               )}

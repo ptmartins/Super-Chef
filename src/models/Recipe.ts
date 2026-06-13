@@ -72,6 +72,15 @@ const RecipeSchema = new Schema<RecipeDocument>(
     },
     slug: { type: String, required: true, unique: true },
     author: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    translations: {
+      pt: {
+        title: { type: String, trim: true },
+        description: { type: String, trim: true },
+        ingredients: [{ name: { type: String, trim: true }, _id: false }],
+        steps: [{ description: { type: String, trim: true }, _id: false }],
+        tags: [{ type: String }],
+      },
+    },
   },
   { timestamps: true }
 );

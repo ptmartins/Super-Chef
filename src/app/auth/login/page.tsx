@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -25,6 +26,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const t = useTranslation();
 
   const {
     register,
@@ -50,7 +52,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setServerError("Invalid email or password. Please try again.");
+      setServerError(t("auth.login.error"));
       return;
     }
 
@@ -70,9 +72,9 @@ export default function LoginPage() {
 
         <div className="rounded-2xl border bg-card shadow-sm p-8">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-display font-bold">Welcome back</h1>
+            <h1 className="text-2xl font-display font-bold">{t("auth.login.title")}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Sign in to your Super Chef account
+              {t("auth.login.subtitle")}
             </p>
           </div>
 
@@ -84,12 +86,12 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.login.email")}</Label>
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.login.emailPlaceholder")}
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 className={errors.email ? "border-destructive" : ""}
@@ -101,12 +103,12 @@ export default function LoginPage() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.login.password")}</Label>
                 <Link
                   href="/auth/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary hover:underline"
                 >
-                  Forgot password?
+                  {t("auth.login.forgotPassword")}
                 </Link>
               </div>
               <div className="relative">
@@ -114,7 +116,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="••••••••"
+                  placeholder={t("auth.login.passwordPlaceholder")}
                   {...register("password")}
                   aria-invalid={!!errors.password}
                   className={`pr-10 ${errors.password ? "border-destructive" : ""}`}
@@ -124,7 +126,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -141,23 +143,23 @@ export default function LoginPage() {
                 onCheckedChange={(checked) => setValue("remember", !!checked)}
               />
               <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
-                Keep me logged in
+                {t("auth.login.remember")}
               </Label>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Sign in
+              {t("auth.login.submit")}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            {t("auth.login.noAccount")}{" "}
             <Link
               href="/auth/register"
               className="font-medium text-primary hover:underline"
             >
-              Create one
+              {t("auth.login.createOne")}
             </Link>
           </p>
         </div>

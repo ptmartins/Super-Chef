@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIES, type Category } from "@/types";
 import { getCategoryColor, cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export function RecipeFilters() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export function RecipeFilters() {
   };
 
   const hasFilters = search || category || difficulty || searchParams.get("maxTime");
+  const t = useTranslation();
 
   return (
     <div className="space-y-5">
@@ -57,7 +59,7 @@ export function RecipeFilters() {
             )}
           >
             <BookOpen className="h-3 w-3" />
-            All
+            {t("recipes.all")}
           </button>
           <button
             onClick={() => updateParam("view", "favorites")}
@@ -69,7 +71,7 @@ export function RecipeFilters() {
             )}
           >
             <Heart className="h-3 w-3" />
-            My Favorites
+            {t("recipes.myFavorites")}
           </button>
         </div>
       )}
@@ -78,7 +80,7 @@ export function RecipeFilters() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
-          placeholder="Search recipes..."
+          placeholder={t("recipes.searchPlaceholder")}
           defaultValue={search}
           onChange={(e) => updateParam("search", e.target.value || null)}
           className="pl-9"
@@ -89,7 +91,7 @@ export function RecipeFilters() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
           <SlidersHorizontal className="h-3 w-3" />
-          Difficulty
+          {t("recipes.difficulty")}
         </p>
         <div className="flex gap-2">
           {(["easy", "medium", "hard"] as const).map((d) => (
@@ -105,7 +107,7 @@ export function RecipeFilters() {
                   : "border-border hover:border-primary/40 hover:bg-muted"
               )}
             >
-              {d}
+              {t(`difficulty.${d}`)}
             </button>
           ))}
         </div>
@@ -114,7 +116,7 @@ export function RecipeFilters() {
       {/* Max time */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          Max time: {maxTime >= 180 ? "Any" : `${maxTime} min`}
+          {t("recipes.maxTimeLabel")} {maxTime >= 180 ? t("recipes.maxTimeAny") : `${maxTime} ${t("recipes.min")}`}
         </p>
         <Slider
           min={15}
@@ -125,15 +127,15 @@ export function RecipeFilters() {
           className="w-full"
         />
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
-          <span>15 min</span>
-          <span>3+ hrs</span>
+          <span>15 {t("recipes.min")}</span>
+          <span>{t("recipes.hrs")}</span>
         </div>
       </div>
 
       {/* Categories */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          Category
+          {t("recipes.category")}
         </p>
         <div className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((cat) => (
@@ -147,7 +149,7 @@ export function RecipeFilters() {
                   : "border-border hover:border-primary/40 bg-background hover:bg-muted"
               )}
             >
-              {cat}
+              {t(`category.${cat}`)}
             </button>
           ))}
         </div>
@@ -157,7 +159,7 @@ export function RecipeFilters() {
       {hasFilters && (
         <Button variant="ghost" size="sm" onClick={clearAll} className="w-full text-muted-foreground">
           <X className="h-3.5 w-3.5 mr-1" />
-          Clear all filters
+          {t("recipes.clearFilters")}
         </Button>
       )}
     </div>

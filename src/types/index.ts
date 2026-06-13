@@ -58,6 +58,14 @@ export const UNITS = [
   "package",
 ] as const;
 
+export interface RecipeTranslationPt {
+  title?: string;
+  description?: string;
+  ingredients?: Array<{ name: string }>;
+  steps?: Array<{ description: string }>;
+  tags?: string[];
+}
+
 export interface IRecipe {
   _id: string;
   title: string;
@@ -73,6 +81,7 @@ export interface IRecipe {
   suitableFor: MealType[];
   slug: string;
   author?: { _id: string; name: string } | null;
+  translations?: { pt?: RecipeTranslationPt };
   createdAt: string;
   updatedAt: string;
 }

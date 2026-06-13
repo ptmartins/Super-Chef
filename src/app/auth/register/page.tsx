@@ -10,6 +10,7 @@ import { ChefHat, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 const registerSchema = z
   .object({
@@ -33,6 +34,7 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const t = useTranslation();
 
   const {
     register,
@@ -58,7 +60,7 @@ export default function RegisterPage() {
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
       setServerError(
-        (json as { error?: string }).error ?? "Registration failed. Please try again."
+        (json as { error?: string }).error ?? t("auth.register.error")
       );
       return;
     }
@@ -78,9 +80,9 @@ export default function RegisterPage() {
 
         <div className="rounded-2xl border bg-card shadow-sm p-8">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-display font-bold">Create an account</h1>
+            <h1 className="text-2xl font-display font-bold">{t("auth.register.title")}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Join Super Chef and start building your recipe collection
+              {t("auth.register.subtitle")}
             </p>
           </div>
 
@@ -92,12 +94,12 @@ export default function RegisterPage() {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("auth.register.name")}</Label>
               <Input
                 id="name"
                 type="text"
                 autoComplete="name"
-                placeholder="Your name"
+                placeholder={t("auth.register.namePlaceholder")}
                 {...register("name")}
                 aria-invalid={!!errors.name}
                 className={errors.name ? "border-destructive" : ""}
@@ -108,12 +110,12 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.register.email")}</Label>
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.register.emailPlaceholder")}
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 className={errors.email ? "border-destructive" : ""}
@@ -124,13 +126,13 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.register.password")}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Min. 6 characters"
+                  placeholder={t("auth.register.passwordPlaceholder")}
                   {...register("password")}
                   aria-invalid={!!errors.password}
                   className={`pr-10 ${errors.password ? "border-destructive" : ""}`}
@@ -140,7 +142,7 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("auth.register.hidePassword") : t("auth.register.showPassword")}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -151,13 +153,13 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Label htmlFor="confirmPassword">{t("auth.register.confirm")}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Re-enter your password"
+                  placeholder={t("auth.register.confirmPlaceholder")}
                   {...register("confirmPassword")}
                   aria-invalid={!!errors.confirmPassword}
                   className={`pr-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
@@ -167,7 +169,7 @@ export default function RegisterPage() {
                   onClick={() => setShowConfirmPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={showConfirmPassword ? t("auth.register.hidePassword") : t("auth.register.showPassword")}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -181,17 +183,17 @@ export default function RegisterPage() {
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Create account
+              {t("auth.register.submit")}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.register.hasAccount")}{" "}
             <Link
               href="/auth/login"
               className="font-medium text-primary hover:underline"
             >
-              Sign in
+              {t("auth.register.signIn")}
             </Link>
           </p>
         </div>

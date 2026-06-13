@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, GripVertical, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, Upload, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +15,7 @@ import { CATEGORIES, UNITS, type IRecipe } from "@/types";
 import { getCategoryColor, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface RecipeFormProps {
   recipe?: IRecipe;
@@ -23,10 +24,19 @@ interface RecipeFormProps {
 export function RecipeForm({ recipe }: RecipeFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(recipe?.thumbnail.url ?? null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [ptOpen, setPtOpen] = useState(!!(recipe?.translations?.pt));
+  const [ptData, setPtData] = useState({
+    title: recipe?.translations?.pt?.title ?? "",
+    description: recipe?.translations?.pt?.description ?? "",
+    ingredientNames: recipe?.translations?.pt?.ingredients?.map((i) => i.name) ?? [] as string[],
+    stepDescriptions: recipe?.translations?.pt?.steps?.map((s) => s.description) ?? [] as string[],
+    tags: recipe?.translations?.pt?.tags?.join(", ") ?? "",
+  });
 
   const {
     register,
@@ -107,7 +117,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
 
   const onSubmit = async (data: RecipeFormData) => {
     if (!recipe && !thumbnailFile) {
-      toast({ title: "Photo required", description: "Please add a recipe photo.", variant: "destructive" });
+      toast({ title: t("form.photoRequired"), description: t("form.photoRequiredDesc"), variant: "destructive" });
       return;
     }
 
@@ -116,7 +126,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       let thumbnailUrl = recipe?.thumbnail.url;
       let thumbnailPublicId = recipe?.thumbnail.publicId;
 
-      // Upload image directly to Cloudinary if a new file was selected
       if (thumbnailFile) {
         const uploaded = await uploadToCloudinary(thumbnailFile);
         thumbnailUrl = uploaded.url;
@@ -126,10 +135,27 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       const url = recipe ? `/api/recipes/${recipe._id}` : "/api/recipes";
       const method = recipe ? "PUT" : "POST";
 
+      const hasAnyPt = ptData.title || ptData.description || ptData.tags ||
+        ptData.ingredientNames.some(Boolean) || ptData.stepDescriptions.some(Boolean);
+
+      const translations = hasAnyPt ? {
+        pt: {
+          ...(ptData.title && { title: ptData.title }),
+          ...(ptData.description && { description: ptData.description }),
+          ...(ptData.ingredientNames.some(Boolean) && {
+            ingredients: data.ingredients.map((_, i) => ({ name: ptData.ingredientNames[i] ?? "" })),
+          }),
+          ...(ptData.stepDescriptions.some(Boolean) && {
+            steps: data.steps.map((_, i) => ({ description: ptData.stepDescriptions[i] ?? "" })),
+          }),
+          ...(ptData.tags && { tags: ptData.tags.split(",").map((s) => s.trim()).filter(Boolean) }),
+        },
+      } : undefined;
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, thumbnailUrl, thumbnailPublicId }),
+        body: JSON.stringify({ ...data, thumbnailUrl, thumbnailPublicId, translations }),
       });
       const result = await res.json();
 
@@ -137,13 +163,13 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         throw new Error(result.error ?? "Failed to save recipe");
       }
 
-      toast({ title: recipe ? "Recipe updated!" : "Recipe created!" });
+      toast({ title: recipe ? t("form.recipeUpdated") : t("form.recipeCreated") });
       router.push(`/recipes/${result.recipe._id}`);
       router.refresh();
     } catch (err) {
       toast({
-        title: "Error",
-        description: err instanceof Error ? err.message : "Something went wrong",
+        title: t("form.error"),
+        description: err instanceof Error ? err.message : t("form.somethingWrong"),
         variant: "destructive",
       });
     } finally {
@@ -426,25 +452,126 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </Button>
       </div>
 
+      {/* Portuguese Translation */}
+      <div className="rounded-2xl border border-dashed border-border bg-muted/30">
+        <button
+          type="button"
+          onClick={() => setPtOpen((v) => !v)}
+          className="flex w-full items-center justify-between px-5 py-4 text-sm font-semibold"
+        >
+          <span className="flex items-center gap-2">
+            🇵🇹 {t("form.pt.section")}
+            <span className="text-xs font-normal text-muted-foreground">— {t("form.pt.optional")}</span>
+          </span>
+          {ptOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+
+        {ptOpen && (
+          <div className="px-5 pb-5 space-y-4 border-t border-dashed border-border pt-4">
+            {/* PT Title */}
+            <div className="space-y-2">
+              <Label>{t("form.pt.title")}</Label>
+              <Input
+                placeholder={t("form.pt.titlePlaceholder")}
+                value={ptData.title}
+                onChange={(e) => setPtData((p) => ({ ...p, title: e.target.value }))}
+              />
+            </div>
+
+            {/* PT Description */}
+            <div className="space-y-2">
+              <Label>{t("form.pt.description")}</Label>
+              <Textarea
+                placeholder={t("form.pt.descriptionPlaceholder")}
+                rows={3}
+                value={ptData.description}
+                onChange={(e) => setPtData((p) => ({ ...p, description: e.target.value }))}
+              />
+            </div>
+
+            {/* PT Ingredient names */}
+            {ingredientFields.length > 0 && (
+              <div className="space-y-2">
+                <Label>{t("form.pt.ingredientNames")}</Label>
+                <div className="space-y-2">
+                  {ingredientFields.map((field, i) => (
+                    <div key={field.id} className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground w-28 truncate shrink-0">
+                        {watch(`ingredients.${i}.name`) || `#${i + 1}`}
+                      </span>
+                      <Input
+                        placeholder={`${t("form.pt.title").replace(" (PT)", "")} (PT)`}
+                        value={ptData.ingredientNames[i] ?? ""}
+                        onChange={(e) => {
+                          const names = [...ptData.ingredientNames];
+                          names[i] = e.target.value;
+                          setPtData((p) => ({ ...p, ingredientNames: names }));
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PT Step descriptions */}
+            {stepFields.length > 0 && (
+              <div className="space-y-2">
+                <Label>{t("form.pt.stepDescs")}</Label>
+                <div className="space-y-2">
+                  {stepFields.map((field, i) => (
+                    <div key={field.id} className="flex items-start gap-3">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold mt-1">
+                        {i + 1}
+                      </div>
+                      <Textarea
+                        placeholder={`${t("recipe.preparation")} ${i + 1} (PT)`}
+                        rows={2}
+                        className="flex-1"
+                        value={ptData.stepDescriptions[i] ?? ""}
+                        onChange={(e) => {
+                          const descs = [...ptData.stepDescriptions];
+                          descs[i] = e.target.value;
+                          setPtData((p) => ({ ...p, stepDescriptions: descs }));
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PT Tags */}
+            <div className="space-y-2">
+              <Label>{t("form.pt.tags")} <span className="text-xs text-muted-foreground">{t("form.tagsHint")}</span></Label>
+              <Input
+                placeholder={t("form.pt.tagsPlaceholder")}
+                value={ptData.tags}
+                onChange={(e) => setPtData((p) => ({ ...p, tags: e.target.value }))}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Submit */}
       <div className="flex gap-3 pt-4 border-t">
         <Button type="button" variant="outline" onClick={() => router.back()}>
-          Cancel
+          {t("form.cancel")}
         </Button>
         <Button type="submit" disabled={isSubmitting} className="flex-1">
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              {thumbnailFile ? "Uploading photo..." : recipe ? "Updating..." : "Creating..."}
+              {thumbnailFile ? t("form.uploading") : recipe ? t("form.updating") : t("form.creating")}
             </>
           ) : (
-            recipe ? "Update Recipe" : "Create Recipe"
+            recipe ? t("form.updateRecipe") : t("form.createRecipe")
           )}
         </Button>
       </div>
 
-      {/* Suppress unused var warning */}
-      <div className="hidden">{watchedCategories.length} {watchedSuitableFor.length}</div>
+      <div className="hidden">{watchedCategories.length}{watchedSuitableFor.length}</div>
     </form>
   );
 }
