@@ -11,6 +11,12 @@ import { getMenuDays } from "@/lib/utils";
 export async function POST(req: NextRequest) {
   await connectDB();
 
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Sign in to generate a menu" }, { status: 401 });
+  }
+  const userId = session.user.id;
+
   try {
     const body = await req.json();
     const parsed = generateMenuSchema.safeParse(body);
@@ -29,12 +35,8 @@ export async function POST(req: NextRequest) {
     // Resolve favorite IDs when source is "favorites"
     let favoriteIds: string[] | undefined;
     if (recipeSource === "favorites") {
-      const session = await auth();
-      if (!session?.user) {
-        return NextResponse.json({ error: "Sign in to generate a menu from your favorites" }, { status: 401 });
-      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const user = await User.findById(session.user.id).select("favorites").lean() as any;
+      const user = await User.findById(userId).select("favorites").lean() as any;
       const ids: string[] = (user?.favorites ?? []).map((id: any) => id.toString());
       if (ids.length === 0) {
         return NextResponse.json(
@@ -58,6 +60,7 @@ export async function POST(req: NextRequest) {
     });
 
     const menu = await Menu.create({
+      userId,
       name,
       type,
       startDate,

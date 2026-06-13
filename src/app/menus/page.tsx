@@ -1,8 +1,10 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Sparkles, CalendarDays } from "lucide-react";
 import { cookies } from "next/headers";
+import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
 import type { IMenu } from "@/types";
@@ -14,12 +16,15 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = { title: "Menus" };
 
 export default async function MenusPage() {
+  const session = await auth();
+  if (!session?.user) redirect("/auth/login");
+
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
   const t = getT(locale);
 
   await connectDB();
-  const raw = await Menu.find({}, { days: 0 }).sort({ createdAt: -1 }).limit(20).lean();
+  const raw = await Menu.find({ userId: session.user.id }, { days: 0 }).sort({ createdAt: -1 }).limit(20).lean();
   const menus: IMenu[] = JSON.parse(JSON.stringify(raw));
 
   return (

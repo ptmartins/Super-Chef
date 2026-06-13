@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
 
 interface MenuDocument extends Document {
+  userId: mongoose.Types.ObjectId;
   name: string;
   type: "weekly" | "biweekly" | "monthly";
   startDate: Date;
@@ -56,6 +57,7 @@ const AggregatedIngredientSchema = new Schema(
 
 const MenuSchema = new Schema<MenuDocument>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     name: { type: String, required: true, trim: true, maxlength: 120 },
     type: { type: String, required: true, enum: ["weekly", "biweekly", "monthly"] },
     startDate: { type: Date, required: true },

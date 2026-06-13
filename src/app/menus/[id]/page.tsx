@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ChevronLeft, CalendarDays, ShoppingCart } from "lucide-react";
 import { cookies } from "next/headers";
+import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
 import type { IMenu } from "@/types";
@@ -29,6 +30,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function MenuDetailPage({ params }: PageProps) {
+  const session = await auth();
+  if (!session?.user) redirect("/auth/login");
+
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
   const t = getT(locale);
@@ -37,6 +41,7 @@ export default async function MenuDetailPage({ params }: PageProps) {
   await connectDB();
   const raw = await Menu.findById(id).lean();
   if (!raw) notFound();
+  if ((raw as unknown as { userId: { toString(): string } }).userId.toString() !== session.user.id) notFound();
   const menu: IMenu = JSON.parse(JSON.stringify(raw));
 
   const typeLabel = t(`menus.type.${menu.type}`);

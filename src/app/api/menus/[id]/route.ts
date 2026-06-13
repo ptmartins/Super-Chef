@@ -1,25 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
 import Recipe from "@/models/Recipe";
 import { aggregateIngredients } from "@/lib/aggregateIngredients";
 import type { IRecipe } from "@/types";
 
+async function getOwnedMenu(id: string, userId: string) {
+  const menu = await Menu.findById(id);
+  if (!menu) return { menu: null, error: "Menu not found", status: 404 };
+  if (menu.userId.toString() !== userId) return { menu: null, error: "Forbidden", status: 403 };
+  return { menu, error: null, status: 200 };
+}
+
 // GET /api/menus/[id]
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   await connectDB();
   const { id } = await params;
-  const menu = await Menu.findById(id).lean();
-  if (!menu) return NextResponse.json({ error: "Menu not found" }, { status: 404 });
+  const { menu, error, status } = await getOwnedMenu(id, session.user.id);
+  if (!menu) return NextResponse.json({ error }, { status });
   return NextResponse.json({ menu });
 }
 
 // PUT /api/menus/[id] — rename or swap a meal slot
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   await connectDB();
   const { id } = await params;
-  const menu = await Menu.findById(id);
-  if (!menu) return NextResponse.json({ error: "Menu not found" }, { status: 404 });
+  const { menu, error, status } = await getOwnedMenu(id, session.user.id);
+  if (!menu) return NextResponse.json({ error }, { status });
 
   const body = await req.json();
 
@@ -64,9 +78,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // DELETE /api/menus/[id]
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   await connectDB();
   const { id } = await params;
-  const menu = await Menu.findByIdAndDelete(id);
-  if (!menu) return NextResponse.json({ error: "Menu not found" }, { status: 404 });
+  const { menu, error, status } = await getOwnedMenu(id, session.user.id);
+  if (!menu) return NextResponse.json({ error }, { status });
+
+  await menu.deleteOne();
   return new NextResponse(null, { status: 204 });
 }
