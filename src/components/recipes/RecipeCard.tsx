@@ -66,6 +66,9 @@ export function RecipeCard({ recipe, index = 0, isFavorited }: RecipeCardProps) 
                 <Users className="h-3.5 w-3.5" />
                 {recipe.servings} servings
               </span>
+              <span className="ml-auto truncate">
+                {recipe.author?.name ?? "System"}
+              </span>
             </div>
 
             {/* Categories */}

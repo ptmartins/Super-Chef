@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
+import User from "@/models/User";
 import { uniqueSlug } from "@/lib/slugify";
 import { recipeSchema } from "@/lib/validations/recipe.schema";
 import { auth } from "@/lib/auth";
@@ -38,7 +39,13 @@ export async function POST(req: NextRequest) {
       ...parsed.data,
       thumbnail: { url: thumbnailUrl, publicId: thumbnailPublicId },
       slug,
+      author: session.user.id,
     });
+
+    await User.updateOne(
+      { _id: session.user.id },
+      { $addToSet: { favorites: recipe._id } }
+    );
 
     return NextResponse.json({ recipe }, { status: 201 });
   } catch (err) {
@@ -78,6 +85,7 @@ export async function GET(req: NextRequest) {
       .sort({ [sortBy]: sortOrder })
       .skip((page - 1) * limit)
       .limit(limit)
+      .populate("author", "name")
       .lean(),
     Recipe.countDocuments(query),
   ]);

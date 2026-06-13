@@ -71,6 +71,7 @@ const RecipeSchema = new Schema<RecipeDocument>(
       },
     },
     slug: { type: String, required: true, unique: true },
+    author: { type: Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true }
 );

@@ -32,7 +32,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
   const isLoggedIn = !!session?.user;
 
   await connectDB();
-  const raw = await Recipe.findById(id).lean();
+  const raw = await Recipe.findById(id).populate("author", "name").lean();
   if (!raw) notFound();
   const recipe: IRecipe = JSON.parse(JSON.stringify(raw));
 
@@ -70,6 +70,9 @@ export default async function RecipeDetailPage({ params }: PageProps) {
               ))}
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-bold">{recipe.title}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              By {recipe.author?.name ?? "System"}
+            </p>
             <p className="mt-3 text-muted-foreground leading-relaxed">{recipe.description}</p>
           </div>
 

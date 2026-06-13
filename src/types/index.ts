@@ -72,6 +72,7 @@ export interface IRecipe {
   tags: string[];
   suitableFor: MealType[];
   slug: string;
+  author?: { _id: string; name: string } | null;
   createdAt: string;
   updatedAt: string;
 }
