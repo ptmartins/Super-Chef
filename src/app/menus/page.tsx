@@ -2,9 +2,11 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Sparkles, CalendarDays } from "lucide-react";
+import { cookies } from "next/headers";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
 import type { IMenu } from "@/types";
+import { getT, type Locale } from "@/lib/i18n";
 import { MenuCard } from "@/components/menus/MenuCard";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,10 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = { title: "Menus" };
 
 export default async function MenusPage() {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
+  const t = getT(locale);
+
   await connectDB();
   const raw = await Menu.find({}, { days: 0 }).sort({ createdAt: -1 }).limit(20).lean();
   const menus: IMenu[] = JSON.parse(JSON.stringify(raw));
@@ -20,13 +26,13 @@ export default async function MenusPage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-display font-bold">Menus</h1>
-          <p className="text-muted-foreground mt-1">Your generated meal plans</p>
+          <h1 className="text-3xl font-display font-bold">{t("menus.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("menus.subtitle")}</p>
         </div>
         <Button asChild>
           <Link href="/menus/generate">
             <Sparkles className="h-4 w-4 mr-1" />
-            Generate Menu
+            {t("menus.generate")}
           </Link>
         </Button>
       </div>
@@ -34,13 +40,13 @@ export default async function MenusPage() {
       {menus.length === 0 ? (
         <EmptyState
           icon={<CalendarDays className="h-8 w-8" />}
-          title="No menus yet"
-          description="Generate your first meal plan from your recipe collection."
+          title={t("menus.noMenus")}
+          description={t("menus.noMenusDesc")}
           action={
             <Button asChild>
               <Link href="/menus/generate">
                 <Sparkles className="h-4 w-4 mr-1" />
-                Generate Menu
+                {t("menus.generate")}
               </Link>
             </Button>
           }

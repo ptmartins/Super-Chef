@@ -10,15 +10,12 @@ import { ChefHat, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-// ── Step 1: request code ──────────────────────────────────────────────────────
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 const emailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 type EmailFormData = z.infer<typeof emailSchema>;
-
-// ── Step 2: verify code + new password ───────────────────────────────────────
 
 const resetSchema = z
   .object({
@@ -35,20 +32,17 @@ const resetSchema = z
   });
 type ResetFormData = z.infer<typeof resetSchema>;
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const t = useTranslation();
   const [step, setStep] = useState<"email" | "reset" | "done">("email");
   const [email, setEmail] = useState("");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // Step 1 form
   const emailForm = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
   });
 
-  // Step 2 form
   const resetForm = useForm<ResetFormData>({
     resolver: zodResolver(resetSchema),
   });
@@ -62,7 +56,7 @@ export default function ForgotPasswordPage() {
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error || "Something went wrong. Please try again.");
+      setServerError(json.error || t("auth.forgot.error"));
       return;
     }
     setEmail(data.email);
@@ -78,7 +72,7 @@ export default function ForgotPasswordPage() {
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error || "Something went wrong. Please try again.");
+      setServerError(json.error || t("auth.forgot.error"));
       return;
     }
     setStep("done");
@@ -96,13 +90,13 @@ export default function ForgotPasswordPage() {
 
         <div className="rounded-2xl border bg-card shadow-sm p-8">
 
-          {/* ── Step 1: enter email ── */}
+          {/* Step 1: enter email */}
           {step === "email" && (
             <>
               <div className="mb-6 text-center">
-                <h1 className="text-2xl font-display font-bold">Forgot password?</h1>
+                <h1 className="text-2xl font-display font-bold">{t("auth.forgot.title")}</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Enter your email and we&apos;ll send you a 6-digit reset code.
+                  {t("auth.forgot.subtitle")}
                 </p>
               </div>
 
@@ -118,12 +112,12 @@ export default function ForgotPasswordPage() {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("auth.forgot.email")}</Label>
                   <Input
                     id="email"
                     type="email"
                     autoComplete="email"
-                    placeholder="you@example.com"
+                    placeholder={t("auth.login.emailPlaceholder")}
                     {...emailForm.register("email")}
                     aria-invalid={!!emailForm.formState.errors.email}
                     className={emailForm.formState.errors.email ? "border-destructive" : ""}
@@ -143,7 +137,7 @@ export default function ForgotPasswordPage() {
                   {emailForm.formState.isSubmitting && (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   )}
-                  Send reset code
+                  {t("auth.forgot.sendCode")}
                 </Button>
               </form>
 
@@ -153,19 +147,19 @@ export default function ForgotPasswordPage() {
                   className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back to sign in
+                  {t("auth.forgot.backToSignIn")}
                 </Link>
               </p>
             </>
           )}
 
-          {/* ── Step 2: enter code + new password ── */}
+          {/* Step 2: enter code + new password */}
           {step === "reset" && (
             <>
               <div className="mb-6 text-center">
-                <h1 className="text-2xl font-display font-bold">Enter reset code</h1>
+                <h1 className="text-2xl font-display font-bold">{t("auth.forgot.enterCode")}</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  We sent a 6-digit code to{" "}
+                  {t("auth.forgot.codeSentTo")}{" "}
                   <span className="font-medium text-foreground">{email}</span>.
                 </p>
               </div>
@@ -182,7 +176,7 @@ export default function ForgotPasswordPage() {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="code">6-digit code</Label>
+                  <Label htmlFor="code">{t("auth.forgot.codeLabel")}</Label>
                   <Input
                     id="code"
                     type="text"
@@ -204,7 +198,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password">New password</Label>
+                  <Label htmlFor="password">{t("auth.forgot.newPassword")}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -222,7 +216,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirm">Confirm new password</Label>
+                  <Label htmlFor="confirm">{t("auth.forgot.confirmPassword")}</Label>
                   <Input
                     id="confirm"
                     type="password"
@@ -247,12 +241,12 @@ export default function ForgotPasswordPage() {
                   {resetForm.formState.isSubmitting && (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   )}
-                  Reset password
+                  {t("auth.forgot.resetPassword")}
                 </Button>
               </form>
 
               <p className="mt-4 text-center text-sm text-muted-foreground">
-                Didn&apos;t receive a code?{" "}
+                {t("auth.forgot.noCode")}{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -261,24 +255,24 @@ export default function ForgotPasswordPage() {
                   }}
                   className="font-medium text-primary hover:underline"
                 >
-                  Try again
+                  {t("auth.forgot.tryAgain")}
                 </button>
               </p>
             </>
           )}
 
-          {/* ── Done ── */}
+          {/* Done */}
           {step === "done" && (
             <div className="py-4 text-center space-y-4">
               <div className="flex justify-center">
                 <CheckCircle2 className="h-12 w-12 text-green-500" />
               </div>
-              <h1 className="text-2xl font-display font-bold">Password updated!</h1>
+              <h1 className="text-2xl font-display font-bold">{t("auth.forgot.doneTitle")}</h1>
               <p className="text-sm text-muted-foreground">
-                Your password has been reset. You can now sign in with your new password.
+                {t("auth.forgot.doneDesc")}
               </p>
               <Button className="w-full" onClick={() => router.push("/auth/login")}>
-                Sign in
+                {t("auth.forgot.signIn")}
               </Button>
             </div>
           )}

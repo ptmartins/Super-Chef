@@ -5,6 +5,7 @@ import type { AggregatedIngredient } from "@/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface ShoppingListProps {
   items: AggregatedIngredient[];
@@ -14,6 +15,7 @@ interface ShoppingListProps {
 
 export function ShoppingList({ items: initialItems, menuId, menuName }: ShoppingListProps) {
   const { toast } = useToast();
+  const t = useTranslation();
   const [items, setItems] = useState(initialItems);
   const [saving, setSaving] = useState<number | null>(null);
 
@@ -30,9 +32,8 @@ export function ShoppingList({ items: initialItems, menuId, menuName }: Shopping
         body: JSON.stringify({ itemIndex: index, checked: newChecked }),
       });
     } catch {
-      // Revert on error
       setItems(items);
-      toast({ title: "Failed to save", variant: "destructive" });
+      toast({ title: t("menus.failedToSave"), variant: "destructive" });
     } finally {
       setSaving(null);
     }
@@ -56,7 +57,6 @@ export function ShoppingList({ items: initialItems, menuId, menuName }: Shopping
     URL.revokeObjectURL(url);
   };
 
-  // Group alphabetically
   const grouped = items.reduce<Record<string, (AggregatedIngredient & { index: number })[]>>(
     (acc, item, index) => {
       const key = item.name[0].toUpperCase();
@@ -73,12 +73,12 @@ export function ShoppingList({ items: initialItems, menuId, menuName }: Shopping
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5 text-primary" />
-          <span className="font-semibold">{items.length} ingredients</span>
-          <span className="text-sm text-muted-foreground">({checkedCount} checked)</span>
+          <span className="font-semibold">{items.length} {t("menus.ingredients")}</span>
+          <span className="text-sm text-muted-foreground">({checkedCount} {t("menus.checked")})</span>
         </div>
         <Button variant="outline" size="sm" onClick={exportList}>
           <Download className="h-3.5 w-3.5 mr-1" />
-          Export
+          {t("menus.export")}
         </Button>
       </div>
 

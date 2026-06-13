@@ -3,11 +3,13 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { cookies } from "next/headers";
 import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
 import User from "@/models/User";
 import { auth } from "@/lib/auth";
 import type { IRecipe } from "@/types";
+import { getT, type Locale } from "@/lib/i18n";
 import { RecipeGrid } from "@/components/recipes/RecipeGrid";
 import { RecipeFilters } from "@/components/recipes/RecipeFilters";
 import { RecipePagination } from "@/components/recipes/RecipePagination";
@@ -87,6 +89,10 @@ export default async function RecipesPage({ searchParams }: PageProps) {
   const session = await auth();
   const view = params.view ?? "all";
 
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
+  const t = getT(locale);
+
   await connectDB();
 
   let favoritedIds = new Set<string>();
@@ -103,8 +109,12 @@ export default async function RecipesPage({ searchParams }: PageProps) {
 
   const isFavoritesView = view === "favorites";
   const headerDescription = isFavoritesView
-    ? total > 0 ? `${total} saved recipe${total !== 1 ? "s" : ""}` : "No favorites yet"
-    : total > 0 ? `${total} recipe${total !== 1 ? "s" : ""} in your collection` : "Start building your recipe collection";
+    ? total > 0
+      ? `${total} ${total !== 1 ? t("recipes.saved") : t("recipes.saved1")}`
+      : t("recipes.noFavorites")
+    : total > 0
+      ? `${total} ${total !== 1 ? t("recipes.collection") : t("recipes.collection1")}`
+      : t("recipes.start");
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -112,14 +122,14 @@ export default async function RecipesPage({ searchParams }: PageProps) {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-display font-bold">
-            {isFavoritesView ? "My Favorites" : "Recipes"}
+            {isFavoritesView ? t("recipes.myFavorites") : t("recipes.title")}
           </h1>
           <p className="text-muted-foreground mt-1">{headerDescription}</p>
         </div>
         <Button asChild>
           <Link href="/recipes/new">
             <Plus className="h-4 w-4 mr-1" />
-            New Recipe
+            {t("recipes.newRecipe")}
           </Link>
         </Button>
       </div>
@@ -128,7 +138,7 @@ export default async function RecipesPage({ searchParams }: PageProps) {
         {/* Sidebar filters */}
         <aside className="lg:w-64 shrink-0">
           <div className="rounded-2xl border bg-card p-5 sticky top-20">
-            <p className="text-sm font-semibold mb-4">Filter Recipes</p>
+            <p className="text-sm font-semibold mb-4">{t("recipes.filterRecipes")}</p>
             <Suspense>
               <RecipeFilters />
             </Suspense>

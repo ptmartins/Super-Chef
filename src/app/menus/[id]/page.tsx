@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, CalendarDays, ShoppingCart, Trash2 } from "lucide-react";
+import { ChevronLeft, CalendarDays, ShoppingCart } from "lucide-react";
+import { cookies } from "next/headers";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
 import type { IMenu } from "@/types";
 import { formatDate, getMenuDays } from "@/lib/utils";
+import { getT, type Locale } from "@/lib/i18n";
 import { MenuCalendar } from "@/components/menus/MenuCalendar";
 import { ShoppingList } from "@/components/menus/ShoppingList";
 import { Button } from "@/components/ui/button";
@@ -27,13 +29,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function MenuDetailPage({ params }: PageProps) {
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
+  const t = getT(locale);
+
   const { id } = await params;
   await connectDB();
   const raw = await Menu.findById(id).lean();
   if (!raw) notFound();
   const menu: IMenu = JSON.parse(JSON.stringify(raw));
 
-  const typeLabel = { weekly: "Weekly", biweekly: "Bi-Weekly", monthly: "Monthly" }[menu.type];
+  const typeLabel = t(`menus.type.${menu.type}`);
   const numDays = getMenuDays(menu.type);
 
   return (
@@ -42,7 +48,7 @@ export default async function MenuDetailPage({ params }: PageProps) {
       <Button asChild variant="ghost" size="sm" className="mb-6 -ml-2">
         <Link href="/menus">
           <ChevronLeft className="h-4 w-4 mr-1" />
-          All menus
+          {t("menus.allMenus")}
         </Link>
       </Button>
 
@@ -51,7 +57,7 @@ export default async function MenuDetailPage({ params }: PageProps) {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-              {typeLabel} · {numDays} days
+              {typeLabel} · {numDays} {t("menus.days")}
             </span>
           </div>
           <h1 className="text-3xl font-display font-bold">{menu.name}</h1>
@@ -63,13 +69,13 @@ export default async function MenuDetailPage({ params }: PageProps) {
         <DeleteMenuButton menuId={id} />
       </div>
 
-      {/* Tabs: Calendar / Shopping List */}
+      {/* Sections */}
       <div className="space-y-8">
         {/* Calendar */}
         <section>
           <h2 className="text-xl font-display font-semibold mb-4 flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-primary" />
-            Meal Calendar
+            {t("menus.mealCalendar")}
           </h2>
           <MenuCalendar menu={menu} />
         </section>
@@ -78,10 +84,10 @@ export default async function MenuDetailPage({ params }: PageProps) {
         <section className="rounded-2xl border bg-card p-6">
           <h2 className="text-xl font-display font-semibold mb-5 flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
-            Shopping List
+            {t("menus.shoppingList")}
           </h2>
           {menu.shoppingList.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No ingredients found. Ensure recipes have ingredients added.</p>
+            <p className="text-sm text-muted-foreground">{t("menus.noIngredients")}</p>
           ) : (
             <ShoppingList items={menu.shoppingList} menuId={id} menuName={menu.name} />
           )}

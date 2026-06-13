@@ -14,21 +14,23 @@ import { generateMenuSchema, type GenerateMenuFormData } from "@/lib/validations
 import { CATEGORIES } from "@/types";
 import { getCategoryColor, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
-
-const MENU_TYPES = [
-  { value: "weekly", label: "Weekly", days: 7, description: "7-day meal plan" },
-  { value: "biweekly", label: "Bi-Weekly", days: 14, description: "14-day meal plan" },
-  { value: "monthly", label: "Monthly", days: 30, description: "30-day meal plan" },
-] as const;
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export function GenerateMenuForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslation();
   const { data: session } = useSession();
   const [isGenerating, setIsGenerating] = useState(false);
   const [filterMaxTime, setFilterMaxTime] = useState(180);
   const [filterCategories, setFilterCategories] = useState<string[]>([]);
   const [recipeSource, setRecipeSource] = useState<"all" | "favorites">("all");
+
+  const menuTypes = [
+    { value: "weekly" as const, days: 7, description: t("menus.form.weeklyDesc") },
+    { value: "biweekly" as const, days: 14, description: t("menus.form.biweeklyDesc") },
+    { value: "monthly" as const, days: 30, description: t("menus.form.monthlyDesc") },
+  ];
 
   const { register, control, handleSubmit, watch, formState: { errors } } = useForm<GenerateMenuFormData>({
     resolver: zodResolver(generateMenuSchema),
@@ -63,13 +65,13 @@ export function GenerateMenuForm() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error ?? "Failed to generate menu");
 
-      toast({ title: "Menu generated!", description: `${data.name} is ready.` });
+      toast({ title: t("menus.generated"), description: `${data.name} is ready.` });
       router.push(`/menus/${result.menu._id}`);
       router.refresh();
     } catch (err) {
       toast({
-        title: "Generation failed",
-        description: err instanceof Error ? err.message : "Something went wrong",
+        title: t("menus.generationFailed"),
+        description: err instanceof Error ? err.message : t("form.somethingWrong"),
         variant: "destructive",
       });
     } finally {
@@ -81,33 +83,33 @@ export function GenerateMenuForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {/* Name */}
       <div className="space-y-2">
-        <Label htmlFor="name">Menu Name *</Label>
-        <Input id="name" placeholder='e.g. "Spring Week Plan"' {...register("name")} />
+        <Label htmlFor="name">{t("menus.form.name")}</Label>
+        <Input id="name" placeholder={t("menus.form.namePlaceholder")} {...register("name")} />
         {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
       </div>
 
       {/* Type */}
       <div className="space-y-2">
-        <Label>Menu Type *</Label>
+        <Label>{t("menus.form.type")}</Label>
         <Controller
           control={control}
           name="type"
           render={({ field }) => (
             <div className="grid grid-cols-3 gap-3">
-              {MENU_TYPES.map((t) => (
+              {menuTypes.map((mt) => (
                 <button
-                  key={t.value}
+                  key={mt.value}
                   type="button"
-                  onClick={() => field.onChange(t.value)}
+                  onClick={() => field.onChange(mt.value)}
                   className={cn(
                     "rounded-xl border-2 p-4 text-left transition-all",
-                    field.value === t.value
+                    field.value === mt.value
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/40 hover:bg-muted"
                   )}
                 >
-                  <div className="font-semibold text-sm">{t.label}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{t.description}</div>
+                  <div className="font-semibold text-sm">{t(`menus.type.${mt.value}`)}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{mt.description}</div>
                 </button>
               ))}
             </div>
@@ -117,14 +119,14 @@ export function GenerateMenuForm() {
 
       {/* Start date */}
       <div className="space-y-2">
-        <Label htmlFor="startDate">Start Date *</Label>
+        <Label htmlFor="startDate">{t("menus.form.startDate")}</Label>
         <Input id="startDate" type="date" {...register("startDate")} />
         {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
       </div>
 
       {/* Meals per day */}
       <div className="space-y-2">
-        <Label>Meals per day *</Label>
+        <Label>{t("menus.form.mealsPerDay")}</Label>
         <Controller
           control={control}
           name="mealsPerDay"
@@ -140,7 +142,7 @@ export function GenerateMenuForm() {
                       );
                     }}
                   />
-                  <span className="text-sm capitalize">{meal}</span>
+                  <span className="text-sm">{t(`meal.${meal}`)}</span>
                 </label>
               ))}
             </div>
@@ -151,7 +153,7 @@ export function GenerateMenuForm() {
 
       {/* Recipe source */}
       <div className="space-y-2">
-        <Label>Recipe source</Label>
+        <Label>{t("menus.form.recipeSource")}</Label>
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
@@ -165,8 +167,8 @@ export function GenerateMenuForm() {
           >
             <BookOpen className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
             <div>
-              <div className="font-semibold text-sm">All recipes</div>
-              <div className="text-xs text-muted-foreground mt-0.5">Pick from the full collection</div>
+              <div className="font-semibold text-sm">{t("menus.form.allRecipes")}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{t("menus.form.allRecipesDesc")}</div>
             </div>
           </button>
           <button
@@ -183,9 +185,9 @@ export function GenerateMenuForm() {
           >
             <Heart className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
             <div>
-              <div className="font-semibold text-sm">My favorites</div>
+              <div className="font-semibold text-sm">{t("menus.form.myFavorites")}</div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                {session ? "Only my saved recipes" : "Sign in to use"}
+                {session ? t("menus.form.favoritesDesc") : t("menus.form.signInToUse")}
               </div>
             </div>
           </button>
@@ -194,12 +196,12 @@ export function GenerateMenuForm() {
 
       {/* Optional filters */}
       <div className="rounded-2xl border bg-muted/30 p-5 space-y-5">
-        <p className="text-sm font-semibold">Optional Recipe Filters</p>
+        <p className="text-sm font-semibold">{t("menus.form.optionalFilters")}</p>
 
         {/* Max time */}
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Max preparation time: {filterMaxTime >= 180 ? "Any" : `${filterMaxTime} min`}
+            {t("menus.form.maxTime")} {filterMaxTime >= 180 ? t("menus.form.maxTimeAny") : `${filterMaxTime} ${t("recipes.min")}`}
           </p>
           <Slider
             min={15}
@@ -212,7 +214,7 @@ export function GenerateMenuForm() {
 
         {/* Categories */}
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Recipe categories (optional)</p>
+          <p className="text-xs text-muted-foreground">{t("menus.form.categories")}</p>
           <div className="flex flex-wrap gap-1.5">
             {CATEGORIES.map((cat) => {
               const selected = filterCategories.includes(cat);
@@ -232,7 +234,7 @@ export function GenerateMenuForm() {
                       : "border-border hover:border-primary/30 bg-background hover:bg-muted"
                   )}
                 >
-                  {cat}
+                  {t(`category.${cat}`)}
                 </button>
               );
             })}
@@ -244,12 +246,12 @@ export function GenerateMenuForm() {
         {isGenerating ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            Generating {watchedType} menu...
+            {t("menus.form.generating")}
           </>
         ) : (
           <>
             <Sparkles className="h-4 w-4 mr-2" />
-            Generate Menu
+            {t("menus.form.generateBtn")}
           </>
         )}
       </Button>

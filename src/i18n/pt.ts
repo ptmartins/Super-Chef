@@ -119,6 +119,10 @@ export const pt: Record<string, string> = {
   "form.error": "Erro",
   "form.somethingWrong": "Algo correu mal",
 
+  // Language tab labels in form
+  "form.lang.en": "Inglês",
+  "form.lang.pt": "Português",
+
   // PT translation section in form
   "form.pt.section": "Tradução em Português",
   "form.pt.optional": "Opcional — mostrado quando o idioma é PT",
@@ -183,6 +187,56 @@ export const pt: Record<string, string> = {
   "auth.forgot.doneDesc": "A tua palavra-passe foi redefinida. Podes agora iniciar sessão com a tua nova palavra-passe.",
   "auth.forgot.signIn": "Iniciar sessão",
   "auth.forgot.error": "Algo correu mal. Tenta novamente.",
+
+  // Menus listing
+  "menus.title": "Menus",
+  "menus.subtitle": "Os teus planos de refeições gerados",
+  "menus.generate": "Gerar Menu",
+  "menus.noMenus": "Nenhum menu ainda",
+  "menus.noMenusDesc": "Gera o teu primeiro plano de refeições a partir da tua coleção de receitas.",
+  "menus.allMenus": "Todos os menus",
+  "menus.mealCalendar": "Calendário de Refeições",
+  "menus.shoppingList": "Lista de Compras",
+  "menus.noIngredients": "Nenhum ingrediente encontrado. Certifica-te de que as receitas têm ingredientes adicionados.",
+  "menus.backToMenus": "Voltar aos menus",
+  "menus.generateDesc": "Iremos selecionar automaticamente receitas da tua coleção e criar um plano de refeições equilibrado com uma lista de compras completa.",
+  "menus.days": "dias",
+  "menus.meals": "refeições",
+  "menus.items": "itens",
+  "menus.type.weekly": "Semanal",
+  "menus.type.biweekly": "Quinzenal",
+  "menus.type.monthly": "Mensal",
+  "menus.failedToSave": "Falha ao guardar",
+  "menus.ingredients": "ingredientes",
+  "menus.checked": "marcados",
+  "menus.export": "Exportar",
+  "menus.generated": "Menu gerado!",
+  "menus.generationFailed": "Falha na geração",
+
+  // Generate menu form
+  "menus.form.name": "Nome do Menu *",
+  "menus.form.namePlaceholder": "ex. \"Plano de Primavera\"",
+  "menus.form.type": "Tipo de Menu *",
+  "menus.form.weeklyDesc": "Plano de 7 dias",
+  "menus.form.biweeklyDesc": "Plano de 14 dias",
+  "menus.form.monthlyDesc": "Plano de 30 dias",
+  "menus.form.startDate": "Data de Início *",
+  "menus.form.mealsPerDay": "Refeições por dia *",
+  "menus.form.recipeSource": "Fonte de receitas",
+  "menus.form.allRecipes": "Todas as receitas",
+  "menus.form.allRecipesDesc": "Escolhe da coleção completa",
+  "menus.form.myFavorites": "Os meus favoritos",
+  "menus.form.favoritesDesc": "Apenas as minhas receitas guardadas",
+  "menus.form.signInToUse": "Inicia sessão para usar",
+  "menus.form.optionalFilters": "Filtros Opcionais de Receitas",
+  "menus.form.maxTime": "Tempo máximo de preparação:",
+  "menus.form.maxTimeAny": "Qualquer",
+  "menus.form.categories": "Categorias de receitas (opcional)",
+  "menus.form.generating": "A gerar menu...",
+  "menus.form.generateBtn": "Gerar Menu",
+
+  // Recipe detail (back link for edit page)
+  "recipe.backToRecipe": "Voltar à receita",
 
   // Difficulty display
   "difficulty.easy": "Fácil",

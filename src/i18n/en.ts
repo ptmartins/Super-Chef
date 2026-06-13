@@ -119,6 +119,10 @@ export const en: Record<string, string> = {
   "form.error": "Error",
   "form.somethingWrong": "Something went wrong",
 
+  // Language tab labels in form
+  "form.lang.en": "English",
+  "form.lang.pt": "Portuguese",
+
   // PT translation section in form
   "form.pt.section": "Portuguese Translation",
   "form.pt.optional": "Optional — shown when language is set to PT",
@@ -183,6 +187,56 @@ export const en: Record<string, string> = {
   "auth.forgot.doneDesc": "Your password has been reset. You can now sign in with your new password.",
   "auth.forgot.signIn": "Sign in",
   "auth.forgot.error": "Something went wrong. Please try again.",
+
+  // Menus listing
+  "menus.title": "Menus",
+  "menus.subtitle": "Your generated meal plans",
+  "menus.generate": "Generate Menu",
+  "menus.noMenus": "No menus yet",
+  "menus.noMenusDesc": "Generate your first meal plan from your recipe collection.",
+  "menus.allMenus": "All menus",
+  "menus.mealCalendar": "Meal Calendar",
+  "menus.shoppingList": "Shopping List",
+  "menus.noIngredients": "No ingredients found. Ensure recipes have ingredients added.",
+  "menus.backToMenus": "Back to menus",
+  "menus.generateDesc": "We will automatically select recipes from your collection and create a balanced meal plan with a full shopping list.",
+  "menus.days": "days",
+  "menus.meals": "meals",
+  "menus.items": "items",
+  "menus.type.weekly": "Weekly",
+  "menus.type.biweekly": "Bi-Weekly",
+  "menus.type.monthly": "Monthly",
+  "menus.failedToSave": "Failed to save",
+  "menus.ingredients": "ingredients",
+  "menus.checked": "checked",
+  "menus.export": "Export",
+  "menus.generated": "Menu generated!",
+  "menus.generationFailed": "Generation failed",
+
+  // Generate menu form
+  "menus.form.name": "Menu Name *",
+  "menus.form.namePlaceholder": "e.g. \"Spring Week Plan\"",
+  "menus.form.type": "Menu Type *",
+  "menus.form.weeklyDesc": "7-day meal plan",
+  "menus.form.biweeklyDesc": "14-day meal plan",
+  "menus.form.monthlyDesc": "30-day meal plan",
+  "menus.form.startDate": "Start Date *",
+  "menus.form.mealsPerDay": "Meals per day *",
+  "menus.form.recipeSource": "Recipe source",
+  "menus.form.allRecipes": "All recipes",
+  "menus.form.allRecipesDesc": "Pick from the full collection",
+  "menus.form.myFavorites": "My favorites",
+  "menus.form.favoritesDesc": "Only my saved recipes",
+  "menus.form.signInToUse": "Sign in to use",
+  "menus.form.optionalFilters": "Optional Recipe Filters",
+  "menus.form.maxTime": "Max preparation time:",
+  "menus.form.maxTimeAny": "Any",
+  "menus.form.categories": "Recipe categories (optional)",
+  "menus.form.generating": "Generating menu...",
+  "menus.form.generateBtn": "Generate Menu",
+
+  // Recipe detail (back link for edit page)
+  "recipe.backToRecipe": "Back to recipe",
 
   // Difficulty display
   "difficulty.easy": "Easy",
