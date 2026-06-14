@@ -101,7 +101,7 @@ export const en: Record<string, string> = {
   "form.suitableFor": "Suitable for *",
   "form.suitableForHint": "(used for menu planning)",
   "form.tags": "Tags",
-  "form.tagsHint": "(comma-separated)",
+  "form.tagsHint": "(press Enter or comma to add each tag)",
   "form.tagsPlaceholder": "e.g. quick, healthy, gluten-free",
   "form.source": "Source / Reference",
   "form.sourcePlaceholder": "e.g. Jamie Oliver's cookbook, BBC Good Food…",

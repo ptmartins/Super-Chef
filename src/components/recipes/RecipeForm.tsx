@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { IngredientAutocomplete } from "@/components/ui/IngredientAutocomplete";
+import { TagInput } from "@/components/ui/TagInput";
 import { recipeSchema, type RecipeFormData } from "@/lib/validations/recipe.schema";
 import { CATEGORIES, UNITS, type IRecipe } from "@/types";
 import { getCategoryColor, cn } from "@/lib/utils";
@@ -39,7 +40,7 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
     description: recipe?.translations?.pt?.description ?? "",
     ingredientNames: recipe?.translations?.pt?.ingredients?.map((i) => i.name) ?? [] as string[],
     stepDescriptions: recipe?.translations?.pt?.steps?.map((s) => s.description) ?? [] as string[],
-    tags: recipe?.translations?.pt?.tags?.join(", ") ?? "",
+    tags: recipe?.translations?.pt?.tags ?? [] as string[],
   });
 
   const {
@@ -139,7 +140,7 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
       const url = recipe ? `/api/recipes/${recipe._id}` : "/api/recipes";
       const method = recipe ? "PUT" : "POST";
 
-      const hasAnyPt = ptData.title || ptData.description || ptData.tags ||
+      const hasAnyPt = ptData.title || ptData.description || ptData.tags.length > 0 ||
         ptData.ingredientNames.some(Boolean) || ptData.stepDescriptions.some(Boolean);
 
       const translations = hasAnyPt ? {
@@ -152,7 +153,7 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
           ...(ptData.stepDescriptions.some(Boolean) && {
             steps: data.steps.map((_, i) => ({ description: ptData.stepDescriptions[i] ?? "" })),
           }),
-          ...(ptData.tags && { tags: ptData.tags.split(",").map((s) => s.trim()).filter(Boolean) }),
+          ...(ptData.tags.length > 0 && { tags: ptData.tags }),
         },
       } : undefined;
 
@@ -283,14 +284,10 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
                 control={control}
                 name="tags"
                 render={({ field }) => (
-                  <Input
+                  <TagInput
+                    value={field.value}
+                    onChange={field.onChange}
                     placeholder={t("form.tagsPlaceholder")}
-                    value={field.value.join(", ")}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
-                      )
-                    }
                   />
                 )}
               />
@@ -434,10 +431,10 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
             {/* PT Tags */}
             <div className="space-y-2">
               <Label>{t("form.pt.tags")} <span className="text-xs text-muted-foreground">{t("form.tagsHint")}</span></Label>
-              <Input
-                placeholder={t("form.pt.tagsPlaceholder")}
+              <TagInput
                 value={ptData.tags}
-                onChange={(e) => setPtData((p) => ({ ...p, tags: e.target.value }))}
+                onChange={(tags) => setPtData((p) => ({ ...p, tags }))}
+                placeholder={t("form.pt.tagsPlaceholder")}
               />
             </div>
 

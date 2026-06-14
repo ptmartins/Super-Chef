@@ -101,7 +101,7 @@ export const pt: Record<string, string> = {
   "form.suitableFor": "Adequado para *",
   "form.suitableForHint": "(usado para planeamento de menus)",
   "form.tags": "Etiquetas",
-  "form.tagsHint": "(separadas por vírgula)",
+  "form.tagsHint": "(prima Enter ou vírgula para adicionar cada etiqueta)",
   "form.tagsPlaceholder": "ex. rápido, saudável, sem glúten",
   "form.source": "Fonte / Referência",
   "form.sourcePlaceholder": "ex. Livro de Jamie Oliver, BBC Good Food…",
