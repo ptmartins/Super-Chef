@@ -2,6 +2,7 @@ export const en: Record<string, string> = {
   // Nav
   "nav.recipes": "Recipes",
   "nav.menus": "Menus",
+  "nav.pantry": "Pantry",
   "nav.newRecipe": "+ New Recipe",
   "nav.signOut": "Sign out",
   "nav.signIn": "Sign in",
@@ -247,6 +248,24 @@ export const en: Record<string, string> = {
   "meal.breakfast": "Breakfast",
   "meal.lunch": "Lunch",
   "meal.dinner": "Dinner",
+
+  // Pantry
+  "pantry.title": "My Pantry",
+  "pantry.subtitle": "Track your available ingredients and discover matching recipes",
+  "pantry.addPlaceholder": "e.g. garlic, olive oil...",
+  "pantry.add": "Add",
+  "pantry.empty": "Your pantry is empty",
+  "pantry.emptyDesc": "Add ingredients you have at home to get recipe suggestions.",
+  "pantry.remove": "Remove",
+  "pantry.suggestions": "Recipe Suggestions",
+  "pantry.suggestionsDesc": "Recipes you can make with your current pantry",
+  "pantry.noSuggestions": "No matching recipes found",
+  "pantry.noSuggestionsDesc": "Add more ingredients to your pantry to see what you can cook.",
+  "pantry.match": "match",
+  "pantry.missing": "Missing:",
+  "pantry.viewRecipe": "View Recipe",
+  "pantry.loadingPantry": "Loading pantry...",
+  "pantry.loadingSuggestions": "Finding recipes...",
 
   // Categories
   "category.fish": "Fish",

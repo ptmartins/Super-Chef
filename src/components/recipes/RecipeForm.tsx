@@ -10,12 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { IngredientAutocomplete } from "@/components/ui/IngredientAutocomplete";
 import { recipeSchema, type RecipeFormData } from "@/lib/validations/recipe.schema";
 import { CATEGORIES, UNITS, type IRecipe } from "@/types";
 import { getCategoryColor, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
-import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { commonIngredients } from "@/lib/commonIngredients";
+import type { Locale } from "@/lib/i18n";
 
 interface RecipeFormProps {
   recipe?: IRecipe;
@@ -24,7 +27,7 @@ interface RecipeFormProps {
 export function RecipeForm({ recipe }: RecipeFormProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const t = useTranslation();
+  const { t, locale } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(recipe?.thumbnail.url ?? null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -284,10 +287,18 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
                 {ingredientFields.map((field, i) => (
                   <div key={field.id} className="flex items-center gap-2">
                     <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input
-                      placeholder={t("form.ingredientNamePlaceholder")}
-                      className="flex-1"
-                      {...register(`ingredients.${i}.name`)}
+                    <Controller
+                      control={control}
+                      name={`ingredients.${i}.name`}
+                      render={({ field: nameField }) => (
+                        <IngredientAutocomplete
+                          value={nameField.value}
+                          onChange={nameField.onChange}
+                          placeholder={t("form.ingredientNamePlaceholder")}
+                          suggestions={commonIngredients[locale as Locale] ?? commonIngredients.en}
+                          className="flex-1"
+                        />
+                      )}
                     />
                     <Input
                       type="number"
@@ -421,15 +432,16 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
                 {ingredientFields.map((field, i) => (
                   <div key={field.id} className="flex items-center gap-2">
                     <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Input
-                      placeholder={t("form.pt.ingredientNames")}
-                      className="flex-1"
+                    <IngredientAutocomplete
                       value={ptData.ingredientNames[i] ?? ""}
-                      onChange={(e) => {
+                      onChange={(val) => {
                         const names = [...ptData.ingredientNames];
-                        names[i] = e.target.value;
+                        names[i] = val;
                         setPtData((p) => ({ ...p, ingredientNames: names }));
                       }}
+                      placeholder={t("form.pt.ingredientNames")}
+                      suggestions={commonIngredients.pt}
+                      className="flex-1"
                     />
                     <Input
                       type="number"

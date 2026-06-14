@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChefHat, BookOpen, CalendarDays, Menu, X, LogIn, LogOut, UserPlus, Sun, Moon } from "lucide-react";
+import { ChefHat, BookOpen, CalendarDays, ShoppingBasket, Menu, X, LogIn, LogOut, UserPlus, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +22,7 @@ export function Navbar() {
   const links = [
     { href: "/recipes", label: t("nav.recipes"), icon: BookOpen },
     { href: "/menus", label: t("nav.menus"), icon: CalendarDays },
+    ...(isLoggedIn ? [{ href: "/pantry", label: t("nav.pantry"), icon: ShoppingBasket }] : []),
   ];
 
   return (

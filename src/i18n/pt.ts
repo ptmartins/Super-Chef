@@ -2,6 +2,7 @@ export const pt: Record<string, string> = {
   // Nav
   "nav.recipes": "Receitas",
   "nav.menus": "Menus",
+  "nav.pantry": "Despensa",
   "nav.newRecipe": "+ Nova Receita",
   "nav.signOut": "Terminar sessão",
   "nav.signIn": "Iniciar sessão",
@@ -247,6 +248,24 @@ export const pt: Record<string, string> = {
   "meal.breakfast": "Pequeno-almoço",
   "meal.lunch": "Almoço",
   "meal.dinner": "Jantar",
+
+  // Pantry
+  "pantry.title": "A Minha Despensa",
+  "pantry.subtitle": "Regista os ingredientes disponíveis e descobre receitas compatíveis",
+  "pantry.addPlaceholder": "ex. alho, azeite...",
+  "pantry.add": "Adicionar",
+  "pantry.empty": "A tua despensa está vazia",
+  "pantry.emptyDesc": "Adiciona ingredientes que tens em casa para obteres sugestões de receitas.",
+  "pantry.remove": "Remover",
+  "pantry.suggestions": "Sugestões de Receitas",
+  "pantry.suggestionsDesc": "Receitas que podes fazer com a tua despensa atual",
+  "pantry.noSuggestions": "Nenhuma receita correspondente",
+  "pantry.noSuggestionsDesc": "Adiciona mais ingredientes à tua despensa para veres o que podes cozinhar.",
+  "pantry.match": "compatível",
+  "pantry.missing": "Em falta:",
+  "pantry.viewRecipe": "Ver Receita",
+  "pantry.loadingPantry": "A carregar despensa...",
+  "pantry.loadingSuggestions": "A encontrar receitas...",
 
   // Categories
   "category.fish": "Peixe",

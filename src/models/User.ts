@@ -6,6 +6,7 @@ export interface IUser {
   email: string;
   password: string;
   favorites?: string[];
+  pantry?: string[];
   resetToken?: string;
   resetTokenExpiry?: Date;
   createdAt: Date;
@@ -26,6 +27,7 @@ const UserSchema = new Schema<UserDocument>(
     },
     password: { type: String, required: true },
     favorites: [{ type: Schema.Types.ObjectId, ref: "Recipe" }],
+    pantry: [{ type: String, trim: true }],
     resetToken: { type: String },
     resetTokenExpiry: { type: Date },
   },
