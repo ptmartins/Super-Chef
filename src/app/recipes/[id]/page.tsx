@@ -1,9 +1,10 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
-import { Clock, Users, ChefHat, Edit3, ChevronLeft } from "lucide-react";
+import { Clock, Users, ChefHat, Edit3, ChevronLeft, BookOpen, UserRound } from "lucide-react";
 import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
 import type { IRecipe } from "@/types";
@@ -75,16 +76,6 @@ export default async function RecipeDetailPage({ params }: PageProps) {
               ))}
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-bold">{recipe.title}</h1>
-            <div className="mt-1 flex flex-col gap-0.5">
-              <p className="text-sm text-muted-foreground">
-                {t("recipe.addedBy")}: <span className="font-medium text-foreground">{recipe.author?.name ?? t("recipes.system")}</span>
-              </p>
-              {recipe.source && (
-                <p className="text-sm text-muted-foreground">
-                  {t("recipe.source")}: <span className="font-medium text-foreground">{recipe.source}</span>
-                </p>
-              )}
-            </div>
             <p className="mt-3 text-muted-foreground leading-relaxed">{recipe.description}</p>
           </div>
 
@@ -98,6 +89,22 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                 </Link>
               </Button>
               <DeleteRecipeButton recipeId={id} />
+            </div>
+          )}
+        </div>
+
+        {/* Attribution row — always visible */}
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 rounded-xl border bg-card px-4 py-2.5">
+            <UserRound className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-xs text-muted-foreground">{t("recipe.addedBy")}:</span>
+            <span className="text-sm font-medium">{recipe.author?.name ?? t("recipes.system")}</span>
+          </div>
+          {recipe.source && (
+            <div className="flex items-center gap-2 rounded-xl border bg-card px-4 py-2.5">
+              <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-xs text-muted-foreground">{t("recipe.source")}:</span>
+              <span className="text-sm font-medium">{recipe.source}</span>
             </div>
           )}
         </div>

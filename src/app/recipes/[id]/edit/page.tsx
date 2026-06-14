@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -41,7 +42,7 @@ export default async function EditRecipePage({ params }: PageProps) {
   const raw = await Recipe.findById(id).lean();
   if (!raw) notFound();
   const recipe: IRecipe = JSON.parse(JSON.stringify(raw));
-  if (recipe.author?.toString() !== session.user.id) notFound();
+  if (recipe.author && recipe.author.toString() !== session.user.id) notFound();
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">

@@ -44,6 +44,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const update: Record<string, any> = { ...parsed.data };
 
+    // Normalise source: empty string → null so the detail page can show/hide it correctly
+    update.source = update.source?.trim() || null;
+    console.log(`[PUT /api/recipes/${id}] source received:`, JSON.stringify(update.source));
+
     // Claim authorless (legacy) recipe for the editing user
     if (!existing.author) {
       update.author = session.user.id;
@@ -59,7 +63,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       update.thumbnail = { url: thumbnailUrl, publicId: thumbnailPublicId };
     }
 
-    const recipe = await Recipe.findByIdAndUpdate(id, update, { new: true });
+    // Use explicit $set to avoid any ambiguity with Mongoose's plain-object update handling
+    const recipe = await Recipe.findByIdAndUpdate(id, { $set: update }, { new: true });
     return NextResponse.json({ recipe });
   } catch (err) {
     console.error("PUT /api/recipes/[id] error:", err);
