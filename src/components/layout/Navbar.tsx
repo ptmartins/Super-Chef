@@ -21,8 +21,12 @@ export function Navbar() {
 
   const links = [
     { href: "/recipes", label: t("nav.recipes"), icon: BookOpen },
-    { href: "/menus", label: t("nav.menus"), icon: CalendarDays },
-    ...(isLoggedIn ? [{ href: "/pantry", label: t("nav.pantry"), icon: ShoppingBasket }] : []),
+    ...(isLoggedIn
+      ? [
+          { href: "/menus", label: t("nav.menus"), icon: CalendarDays },
+          { href: "/pantry", label: t("nav.pantry"), icon: ShoppingBasket },
+        ]
+      : []),
   ];
 
   return (

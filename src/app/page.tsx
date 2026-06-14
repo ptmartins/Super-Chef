@@ -8,6 +8,7 @@ import { connectDB } from "@/lib/mongodb";
 import Recipe from "@/models/Recipe";
 import type { IRecipe } from "@/types";
 import { getT, localizeRecipe, type Locale } from "@/lib/i18n";
+import { auth } from "@/lib/auth";
 
 async function getLatestRecipes(): Promise<IRecipe[]> {
   try {
@@ -23,7 +24,7 @@ export default async function Home() {
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value ?? "en") as Locale;
   const t = getT(locale);
-  const latestRecipes = await getLatestRecipes();
+  const [session, latestRecipes] = await Promise.all([auth(), getLatestRecipes()]);
 
   const features = [
     {
@@ -74,12 +75,14 @@ export default async function Home() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/menus/generate">
-                  {t("home.hero.generateMenu")}
-                  <Sparkles className="h-4 w-4" />
-                </Link>
-              </Button>
+              {session?.user && (
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/menus/generate">
+                    {t("home.hero.generateMenu")}
+                    <Sparkles className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -164,9 +167,11 @@ export default async function Home() {
             <Button asChild size="lg" variant="secondary" className="shadow">
               <Link href="/recipes/new">{t("home.cta.addRecipe")}</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-              <Link href="/menus">{t("home.cta.viewMenus")}</Link>
-            </Button>
+            {session?.user && (
+              <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                <Link href="/menus">{t("home.cta.viewMenus")}</Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
