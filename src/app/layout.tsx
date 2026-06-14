@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Heart } from "lucide-react";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Toaster } from "@/components/ui/toaster";
@@ -33,8 +34,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <main className="flex-1">{children}</main>
               <footer className="border-t py-6 mt-auto">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                  <p className="text-center text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} Super Chef. {t("home.footer")}
+                  <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1 flex-wrap">
+                    © {new Date().getFullYear()} Super Chef. Crafted with
+                    <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500 shrink-0" />
+                    by{" "}
+                    <a
+                      href="https://pedromartins.com.pt"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-foreground hover:text-primary underline underline-offset-2 transition-colors"
+                    >
+                      Pedro Martins
+                    </a>
+                    , for food lovers.
                   </p>
                 </div>
               </footer>

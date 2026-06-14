@@ -34,7 +34,7 @@ export const pt: Record<string, string> = {
   "home.cta.desc": "Adiciona a tua primeira receita e deixa o Super Chef tratar do resto.",
   "home.cta.addRecipe": "+ Adicionar Receita",
   "home.cta.viewMenus": "Ver Menus",
-  "home.footer": "Feito com amor para os apaixonados por gastronomia.",
+  "home.footer": "Feito com amor por Pedro Martins, para os apaixonados por gastronomia.",
 
   // Recipes listing
   "recipes.title": "Receitas",

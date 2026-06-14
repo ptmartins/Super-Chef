@@ -34,7 +34,7 @@ export const en: Record<string, string> = {
   "home.cta.desc": "Add your first recipe and let Super Chef handle the rest.",
   "home.cta.addRecipe": "+ Add Recipe",
   "home.cta.viewMenus": "View Menus",
-  "home.footer": "Crafted with love for food lovers.",
+  "home.footer": "Crafted with love by Pedro Martins, for food lovers.",
 
   // Recipes listing
   "recipes.title": "Recipes",
