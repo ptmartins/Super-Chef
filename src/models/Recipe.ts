@@ -72,6 +72,7 @@ const RecipeSchema = new Schema<RecipeDocument>(
     },
     slug: { type: String, required: true, unique: true },
     author: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    source: { type: String, trim: true, maxlength: 200, default: null },
     translations: {
       pt: {
         title: { type: String, trim: true },

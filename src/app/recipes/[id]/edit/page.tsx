@@ -52,7 +52,7 @@ export default async function EditRecipePage({ params }: PageProps) {
         </Link>
       </Button>
       <h1 className="text-3xl font-display font-bold mb-8">{t("recipe.edit")}</h1>
-      <RecipeForm recipe={recipe} />
+      <RecipeForm recipe={recipe} authorName={session.user.name ?? ""} />
     </div>
   );
 }

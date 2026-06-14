@@ -72,6 +72,8 @@ export const en: Record<string, string> = {
   "recipe.preparation": "Preparation",
   "recipe.edit": "Edit",
   "recipe.newTitle": "New Recipe",
+  "recipe.addedBy": "Added by",
+  "recipe.source": "Source",
 
   // Recipe empty states
   "recipe.empty.noFavorites": "No favorites yet",
@@ -101,6 +103,9 @@ export const en: Record<string, string> = {
   "form.tags": "Tags",
   "form.tagsHint": "(comma-separated)",
   "form.tagsPlaceholder": "e.g. quick, healthy, gluten-free",
+  "form.source": "Source / Reference",
+  "form.sourcePlaceholder": "e.g. Jamie Oliver's cookbook, BBC Good Food…",
+  "form.sourceHint": "Where this recipe comes from. Defaults to your name.",
   "form.ingredients": "Ingredients *",
   "form.ingredientNamePlaceholder": "Ingredient name",
   "form.amountPlaceholder": "Amount",

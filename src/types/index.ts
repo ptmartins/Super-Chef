@@ -81,6 +81,7 @@ export interface IRecipe {
   suitableFor: MealType[];
   slug: string;
   author?: { _id: string; name: string } | null;
+  source?: string | null;
   translations?: { pt?: RecipeTranslationPt };
   createdAt: string;
   updatedAt: string;

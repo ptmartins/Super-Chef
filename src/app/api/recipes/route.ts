@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       thumbnail: { url: thumbnailUrl, publicId: thumbnailPublicId },
       slug,
       author: session.user.id,
+      source: parsed.data.source?.trim() || session.user.name || null,
       ...(translations && { translations }),
     });
 

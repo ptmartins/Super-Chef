@@ -27,6 +27,7 @@ export const recipeSchema = z.object({
   suitableFor: z
     .array(z.enum(["breakfast", "lunch", "dinner"]))
     .min(1, "Select at least one meal type"),
+  source: z.string().max(200).optional(),
 });
 
 export type RecipeFormData = z.infer<typeof recipeSchema>;

@@ -72,6 +72,8 @@ export const pt: Record<string, string> = {
   "recipe.preparation": "Preparação",
   "recipe.edit": "Editar",
   "recipe.newTitle": "Nova Receita",
+  "recipe.addedBy": "Adicionado por",
+  "recipe.source": "Fonte",
 
   // Recipe empty states
   "recipe.empty.noFavorites": "Nenhum favorito ainda",
@@ -101,6 +103,9 @@ export const pt: Record<string, string> = {
   "form.tags": "Etiquetas",
   "form.tagsHint": "(separadas por vírgula)",
   "form.tagsPlaceholder": "ex. rápido, saudável, sem glúten",
+  "form.source": "Fonte / Referência",
+  "form.sourcePlaceholder": "ex. Livro de Jamie Oliver, BBC Good Food…",
+  "form.sourceHint": "De onde vem esta receita. Por omissão, o teu nome.",
   "form.ingredients": "Ingredientes *",
   "form.ingredientNamePlaceholder": "Nome do ingrediente",
   "form.amountPlaceholder": "Qtd.",

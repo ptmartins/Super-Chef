@@ -29,7 +29,7 @@ export default async function NewRecipePage() {
         </Link>
       </Button>
       <h1 className="text-3xl font-display font-bold mb-8">{t("recipe.newTitle")}</h1>
-      <RecipeForm />
+      <RecipeForm authorName={session.user.name ?? ""} />
     </div>
   );
 }

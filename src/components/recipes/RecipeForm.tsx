@@ -22,9 +22,10 @@ import type { Locale } from "@/lib/i18n";
 
 interface RecipeFormProps {
   recipe?: IRecipe;
+  authorName?: string;
 }
 
-export function RecipeForm({ recipe }: RecipeFormProps) {
+export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { t, locale } = useLanguage();
@@ -61,6 +62,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           servings: recipe.servings,
           tags: recipe.tags,
           suitableFor: recipe.suitableFor,
+          source: recipe.source ?? authorName,
         }
       : {
           ingredients: [{ name: "", amount: 1, unit: "g" }],
@@ -71,6 +73,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           servings: 4,
           tags: [],
           suitableFor: ["lunch", "dinner"],
+          source: authorName,
         },
   });
 
@@ -258,6 +261,19 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
                 />
                 {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
               </div>
+            </div>
+
+            {/* Source */}
+            <div className="space-y-2">
+              <Label htmlFor="source">
+                {t("form.source")}
+                <span className="text-xs text-muted-foreground ml-1.5">{t("form.sourceHint")}</span>
+              </Label>
+              <Input
+                id="source"
+                placeholder={t("form.sourcePlaceholder")}
+                {...register("source")}
+              />
             </div>
 
             {/* Tags */}

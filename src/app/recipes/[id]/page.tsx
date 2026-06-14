@@ -75,9 +75,16 @@ export default async function RecipeDetailPage({ params }: PageProps) {
               ))}
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-bold">{recipe.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("recipe.by")} {recipe.author?.name ?? t("recipes.system")}
-            </p>
+            <div className="mt-1 flex flex-col gap-0.5">
+              <p className="text-sm text-muted-foreground">
+                {t("recipe.addedBy")}: <span className="font-medium text-foreground">{recipe.author?.name ?? t("recipes.system")}</span>
+              </p>
+              {recipe.source && (
+                <p className="text-sm text-muted-foreground">
+                  {t("recipe.source")}: <span className="font-medium text-foreground">{recipe.source}</span>
+                </p>
+              )}
+            </div>
             <p className="mt-3 text-muted-foreground leading-relaxed">{recipe.description}</p>
           </div>
 

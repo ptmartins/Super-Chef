@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Users, ChefHat } from "lucide-react";
+import { Clock, Users, ChefHat, UserRound } from "lucide-react";
 import { motion } from "framer-motion";
 import type { IRecipe } from "@/types";
 import { formatTime, getDifficultyColor, getCategoryColor, cn } from "@/lib/utils";
@@ -69,8 +69,9 @@ export function RecipeCard({ recipe, index = 0, isFavorited }: RecipeCardProps) 
                 <Users className="h-3.5 w-3.5" />
                 {r.servings} {t("recipes.servings")}
               </span>
-              <span className="ml-auto truncate">
-                {r.author?.name ?? t("recipes.system")}
+              <span className="ml-auto flex items-center gap-1 min-w-0">
+                <UserRound className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{r.author?.name ?? t("recipes.system")}</span>
               </span>
             </div>
 
