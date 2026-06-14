@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, GripVertical, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, Upload, Loader2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -275,6 +275,10 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
                 placeholder={t("form.sourcePlaceholder")}
                 {...register("source")}
               />
+              <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5 shrink-0 mt-px" />
+                {t("form.sourceNotice")}
+              </p>
             </div>
 
             {/* Tags */}

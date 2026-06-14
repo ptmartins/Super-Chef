@@ -36,6 +36,10 @@ export const en: Record<string, string> = {
   "home.cta.viewMenus": "View Menus",
   "home.footer": "Crafted with love by Pedro Martins, for food lovers.",
 
+  // Footer
+  "footer.nonCommercial": "Non-commercial personal use platform. Recipes belong to their original creators.",
+  "footer.disclaimer": "Read our disclaimer",
+
   // Recipes listing
   "recipes.title": "Recipes",
   "recipes.myFavorites": "My Favorites",
@@ -106,6 +110,7 @@ export const en: Record<string, string> = {
   "form.source": "Source / Reference",
   "form.sourcePlaceholder": "e.g. Jamie Oliver's cookbook, BBC Good Food…",
   "form.sourceHint": "Where this recipe comes from. Defaults to your name.",
+  "form.sourceNotice": "Super Chef doesn't claim ownership of any recipe. Always credit the original source.",
   "form.ingredients": "Ingredients *",
   "form.ingredientNamePlaceholder": "Ingredient name",
   "form.amountPlaceholder": "Amount",

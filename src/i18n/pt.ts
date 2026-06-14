@@ -36,6 +36,10 @@ export const pt: Record<string, string> = {
   "home.cta.viewMenus": "Ver Menus",
   "home.footer": "Feito com amor por Pedro Martins, para os apaixonados por gastronomia.",
 
+  // Footer
+  "footer.nonCommercial": "Plataforma de uso pessoal, sem fins lucrativos. As receitas pertencem aos seus criadores originais.",
+  "footer.disclaimer": "Lê o nosso aviso legal",
+
   // Recipes listing
   "recipes.title": "Receitas",
   "recipes.myFavorites": "Os Meus Favoritos",
@@ -106,6 +110,7 @@ export const pt: Record<string, string> = {
   "form.source": "Fonte / Referência",
   "form.sourcePlaceholder": "ex. Livro de Jamie Oliver, BBC Good Food…",
   "form.sourceHint": "De onde vem esta receita. Por omissão, o teu nome.",
+  "form.sourceNotice": "O Super Chef não reivindica a propriedade de nenhuma receita. Credita sempre a fonte original.",
   "form.ingredients": "Ingredientes *",
   "form.ingredientNamePlaceholder": "Nome do ingrediente",
   "form.amountPlaceholder": "Qtd.",
