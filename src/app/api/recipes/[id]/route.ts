@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const existing = await Recipe.findById(id);
   if (!existing) return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
-  if (existing.author?.toString() !== session.user.id) {
+  if (existing.author && existing.author.toString() !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -43,6 +43,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const update: Record<string, any> = { ...parsed.data };
+
+    // Claim authorless (legacy) recipe for the editing user
+    if (!existing.author) {
+      update.author = session.user.id;
+    }
 
     if (translations !== undefined) {
       update.translations = translations;
@@ -74,7 +79,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const recipe = await Recipe.findById(id);
   if (!recipe) return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
-  if (recipe.author?.toString() !== session.user.id) {
+  if (recipe.author && recipe.author.toString() !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

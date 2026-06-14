@@ -72,6 +72,7 @@ async function fetchRecipes(
       .sort({ [sortBy]: sortOrder })
       .skip((page - 1) * limit)
       .limit(limit)
+      .populate("author", "name")
       .lean(),
     Recipe.countDocuments(query),
   ]);
