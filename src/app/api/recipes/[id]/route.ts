@@ -5,6 +5,7 @@ import Menu from "@/models/Menu";
 import { deleteImage } from "@/lib/cloudinary";
 import { recipeSchema } from "@/lib/validations/recipe.schema";
 import { auth } from "@/lib/auth";
+import { translateRecipeToPortuguese } from "@/lib/translate";
 
 // GET /api/recipes/[id]
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const body = await req.json();
-    const { thumbnailUrl, thumbnailPublicId, translations, ...rest } = body;
+    const { thumbnailUrl, thumbnailPublicId, ...rest } = body;
 
     const parsed = recipeSchema.safeParse(rest);
     if (!parsed.success) {
@@ -52,9 +53,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       update.author = session.user.id;
     }
 
-    if (translations !== undefined) {
-      update.translations = translations;
-    }
+    const pt = await translateRecipeToPortuguese({
+      title: parsed.data.title,
+      description: parsed.data.description,
+      ingredients: parsed.data.ingredients.map((i) => ({ name: i.name })),
+      steps: parsed.data.steps.map((s) => ({ description: s.description })),
+      tags: parsed.data.tags,
+    });
+    update.translations = pt ? { pt } : undefined;
 
     // Only update thumbnail if a new one was uploaded
     if (thumbnailUrl && thumbnailPublicId) {

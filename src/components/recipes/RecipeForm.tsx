@@ -34,14 +34,6 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(recipe?.thumbnail.url ?? null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState<"en" | "pt">("en");
-  const [ptData, setPtData] = useState({
-    title: recipe?.translations?.pt?.title ?? "",
-    description: recipe?.translations?.pt?.description ?? "",
-    ingredientNames: recipe?.translations?.pt?.ingredients?.map((i) => i.name) ?? [] as string[],
-    stepDescriptions: recipe?.translations?.pt?.steps?.map((s) => s.description) ?? [] as string[],
-    tags: recipe?.translations?.pt?.tags ?? [] as string[],
-  });
 
   const {
     register,
@@ -140,27 +132,10 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
       const url = recipe ? `/api/recipes/${recipe._id}` : "/api/recipes";
       const method = recipe ? "PUT" : "POST";
 
-      const hasAnyPt = ptData.title || ptData.description || ptData.tags.length > 0 ||
-        ptData.ingredientNames.some(Boolean) || ptData.stepDescriptions.some(Boolean);
-
-      const translations = hasAnyPt ? {
-        pt: {
-          ...(ptData.title && { title: ptData.title }),
-          ...(ptData.description && { description: ptData.description }),
-          ...(ptData.ingredientNames.some(Boolean) && {
-            ingredients: data.ingredients.map((_, i) => ({ name: ptData.ingredientNames[i] ?? "" })),
-          }),
-          ...(ptData.stepDescriptions.some(Boolean) && {
-            steps: data.steps.map((_, i) => ({ description: ptData.stepDescriptions[i] ?? "" })),
-          }),
-          ...(ptData.tags.length > 0 && { tags: ptData.tags }),
-        },
-      } : undefined;
-
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, thumbnailUrl, thumbnailPublicId, translations }),
+        body: JSON.stringify({ ...data, thumbnailUrl, thumbnailPublicId }),
       });
       const result = await res.json();
 
@@ -212,349 +187,168 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
       </div>
 
-      {/* Language tabs — covers: Title, Description, Ingredients, Steps, Tags */}
-      <div>
-        <div className="flex rounded-xl border overflow-hidden text-sm font-medium mb-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab("en")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 transition-colors",
-              activeTab === "en"
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted text-muted-foreground"
-            )}
-          >
-            🇬🇧 {t("form.lang.en")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("pt")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 transition-colors",
-              activeTab === "pt"
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted text-muted-foreground"
-            )}
-          >
-            🇵🇹 {t("form.lang.pt")}
-            <span className="text-xs opacity-70">({t("form.pt.optional").split("—")[0].trim()})</span>
-          </button>
+      {/* Title & Description */}
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div className="sm:col-span-2 space-y-2">
+          <Label htmlFor="title">{t("form.title")}</Label>
+          <Input id="title" placeholder={t("form.titlePlaceholder")} {...register("title")} />
+          {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
         </div>
+        <div className="sm:col-span-2 space-y-2">
+          <Label htmlFor="description">{t("form.description")}</Label>
+          <Textarea
+            id="description"
+            placeholder={t("form.descriptionPlaceholder")}
+            rows={3}
+            {...register("description")}
+          />
+          {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
+        </div>
+      </div>
 
-        {/* EN tab */}
-        {activeTab === "en" && (
-          <div className="space-y-6">
-            {/* Title & Description */}
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="sm:col-span-2 space-y-2">
-                <Label htmlFor="title">{t("form.title")}</Label>
-                <Input id="title" placeholder={t("form.titlePlaceholder")} {...register("title")} />
-                {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
-              </div>
-              <div className="sm:col-span-2 space-y-2">
-                <Label htmlFor="description">{t("form.description")}</Label>
-                <Textarea
-                  id="description"
-                  placeholder={t("form.descriptionPlaceholder")}
-                  rows={3}
-                  {...register("description")}
-                />
-                {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
-              </div>
-            </div>
+      {/* Source */}
+      <div className="space-y-2">
+        <Label htmlFor="source">
+          {t("form.source")}
+          <span className="text-xs text-muted-foreground ml-1.5">{t("form.sourceHint")}</span>
+        </Label>
+        <Input
+          id="source"
+          placeholder={t("form.sourcePlaceholder")}
+          {...register("source")}
+        />
+        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <Info className="h-3.5 w-3.5 shrink-0 mt-px" />
+          {t("form.sourceNotice")}
+        </p>
+      </div>
 
-            {/* Source */}
-            <div className="space-y-2">
-              <Label htmlFor="source">
-                {t("form.source")}
-                <span className="text-xs text-muted-foreground ml-1.5">{t("form.sourceHint")}</span>
-              </Label>
-              <Input
-                id="source"
-                placeholder={t("form.sourcePlaceholder")}
-                {...register("source")}
-              />
-              <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                <Info className="h-3.5 w-3.5 shrink-0 mt-px" />
-                {t("form.sourceNotice")}
-              </p>
-            </div>
+      {/* Tags */}
+      <div className="space-y-2">
+        <Label>{t("form.tags")} <span className="text-xs text-muted-foreground">{t("form.tagsHint")}</span></Label>
+        <Controller
+          control={control}
+          name="tags"
+          render={({ field }) => (
+            <TagInput
+              value={field.value}
+              onChange={field.onChange}
+              placeholder={t("form.tagsPlaceholder")}
+            />
+          )}
+        />
+      </div>
 
-            {/* Tags */}
-            <div className="space-y-2">
-              <Label>{t("form.tags")} <span className="text-xs text-muted-foreground">{t("form.tagsHint")}</span></Label>
+      {/* Ingredients */}
+      <div className="space-y-3">
+        <Label>{t("form.ingredients")}</Label>
+        <div className="space-y-2">
+          {ingredientFields.map((field, i) => (
+            <div key={field.id} className="flex items-center gap-2">
+              <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
               <Controller
                 control={control}
-                name="tags"
-                render={({ field }) => (
-                  <TagInput
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder={t("form.tagsPlaceholder")}
+                name={`ingredients.${i}.name`}
+                render={({ field: nameField }) => (
+                  <IngredientAutocomplete
+                    value={nameField.value}
+                    onChange={nameField.onChange}
+                    placeholder={t("form.ingredientNamePlaceholder")}
+                    suggestions={commonIngredients[locale as Locale] ?? commonIngredients.en}
+                    className="flex-1"
                   />
                 )}
               />
-            </div>
-
-            {/* Ingredients */}
-            <div className="space-y-3">
-              <Label>{t("form.ingredients")}</Label>
-              <div className="space-y-2">
-                {ingredientFields.map((field, i) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <Controller
-                      control={control}
-                      name={`ingredients.${i}.name`}
-                      render={({ field: nameField }) => (
-                        <IngredientAutocomplete
-                          value={nameField.value}
-                          onChange={nameField.onChange}
-                          placeholder={t("form.ingredientNamePlaceholder")}
-                          suggestions={commonIngredients[locale as Locale] ?? commonIngredients.en}
-                          className="flex-1"
-                        />
-                      )}
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder={t("form.amountPlaceholder")}
-                      className="w-24"
-                      {...register(`ingredients.${i}.amount`, { valueAsNumber: true })}
-                    />
-                    <Controller
-                      control={control}
-                      name={`ingredients.${i}.unit`}
-                      render={({ field: unitField }) => (
-                        <Select value={unitField.value} onValueChange={unitField.onChange}>
-                          <SelectTrigger className="w-24">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {UNITS.map((u) => (
-                              <SelectItem key={u} value={u}>{u}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeIngredient(i)}
-                      disabled={ingredientFields.length <= 1}
-                      className="shrink-0 h-9 w-9 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendIngredient({ name: "", amount: 1, unit: "g" })}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("form.addIngredient")}
-              </Button>
-              {errors.ingredients && (
-                <p className="text-xs text-destructive">{errors.ingredients.message ?? errors.ingredients.root?.message}</p>
-              )}
-            </div>
-
-            {/* Steps */}
-            <div className="space-y-3">
-              <Label>{t("form.steps")}</Label>
-              <div className="space-y-3">
-                {stepFields.map((field, i) => (
-                  <div key={field.id} className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-semibold mt-1">
-                      {i + 1}
-                    </div>
-                    <Textarea
-                      placeholder={`${t("recipe.preparation")} ${i + 1}...`}
-                      rows={2}
-                      className="flex-1"
-                      {...register(`steps.${i}.description`)}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeStep(i)}
-                      disabled={stepFields.length <= 1}
-                      className="shrink-0 mt-1 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendStep({ order: stepFields.length + 1, description: "" })}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("form.addStep")}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* PT tab */}
-        {activeTab === "pt" && (
-          <div className="space-y-4">
-            {/* PT Title */}
-            <div className="space-y-2">
-              <Label>{t("form.pt.title")}</Label>
               <Input
-                placeholder={t("form.pt.titlePlaceholder")}
-                value={ptData.title}
-                onChange={(e) => setPtData((p) => ({ ...p, title: e.target.value }))}
+                type="number"
+                step="0.01"
+                placeholder={t("form.amountPlaceholder")}
+                className="w-24"
+                {...register(`ingredients.${i}.amount`, { valueAsNumber: true })}
               />
-            </div>
-
-            {/* PT Description */}
-            <div className="space-y-2">
-              <Label>{t("form.pt.description")}</Label>
-              <Textarea
-                placeholder={t("form.pt.descriptionPlaceholder")}
-                rows={3}
-                value={ptData.description}
-                onChange={(e) => setPtData((p) => ({ ...p, description: e.target.value }))}
+              <Controller
+                control={control}
+                name={`ingredients.${i}.unit`}
+                render={({ field: unitField }) => (
+                  <Select value={unitField.value} onValueChange={unitField.onChange}>
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNITS.map((u) => (
+                        <SelectItem key={u} value={u}>{u}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
-            </div>
-
-            {/* PT Tags */}
-            <div className="space-y-2">
-              <Label>{t("form.pt.tags")} <span className="text-xs text-muted-foreground">{t("form.tagsHint")}</span></Label>
-              <TagInput
-                value={ptData.tags}
-                onChange={(tags) => setPtData((p) => ({ ...p, tags }))}
-                placeholder={t("form.pt.tagsPlaceholder")}
-              />
-            </div>
-
-            {/* PT Ingredient names */}
-            <div className="space-y-3">
-              <Label>{t("form.pt.ingredientNames")}</Label>
-              <div className="space-y-2">
-                {ingredientFields.map((field, i) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <IngredientAutocomplete
-                      value={ptData.ingredientNames[i] ?? ""}
-                      onChange={(val) => {
-                        const names = [...ptData.ingredientNames];
-                        names[i] = val;
-                        setPtData((p) => ({ ...p, ingredientNames: names }));
-                      }}
-                      placeholder={t("form.pt.ingredientNames")}
-                      suggestions={commonIngredients.pt}
-                      className="flex-1"
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder={t("form.amountPlaceholder")}
-                      className="w-24"
-                      {...register(`ingredients.${i}.amount`, { valueAsNumber: true })}
-                    />
-                    <Controller
-                      control={control}
-                      name={`ingredients.${i}.unit`}
-                      render={({ field: unitField }) => (
-                        <Select value={unitField.value} onValueChange={unitField.onChange}>
-                          <SelectTrigger className="w-24">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {UNITS.map((u) => (
-                              <SelectItem key={u} value={u}>{u}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeIngredient(i)}
-                      disabled={ingredientFields.length <= 1}
-                      className="shrink-0 h-9 w-9 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
               <Button
                 type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendIngredient({ name: "", amount: 1, unit: "g" })}
+                variant="ghost"
+                size="icon"
+                onClick={() => removeIngredient(i)}
+                disabled={ingredientFields.length <= 1}
+                className="shrink-0 h-9 w-9 text-muted-foreground hover:text-destructive"
               >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("form.addIngredient")}
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-
-            {/* PT Step descriptions */}
-            <div className="space-y-2">
-              <Label>{t("form.pt.stepDescs")}</Label>
-              <div className="space-y-2">
-                {stepFields.map((field, i) => (
-                  <div key={field.id} className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-semibold mt-1">
-                      {i + 1}
-                    </div>
-                    <Textarea
-                      placeholder={`${t("recipe.preparation")} ${i + 1} (PT)`}
-                      rows={2}
-                      className="flex-1"
-                      value={ptData.stepDescriptions[i] ?? ""}
-                      onChange={(e) => {
-                        const descs = [...ptData.stepDescriptions];
-                        descs[i] = e.target.value;
-                        setPtData((p) => ({ ...p, stepDescriptions: descs }));
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeStep(i)}
-                      disabled={stepFields.length <= 1}
-                      className="shrink-0 mt-1 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendStep({ order: stepFields.length + 1, description: "" })}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {t("form.addStep")}
-              </Button>
-            </div>
-          </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => appendIngredient({ name: "", amount: 1, unit: "g" })}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          {t("form.addIngredient")}
+        </Button>
+        {errors.ingredients && (
+          <p className="text-xs text-destructive">{errors.ingredients.message ?? errors.ingredients.root?.message}</p>
         )}
       </div>
 
-      {/* Meta — shared */}
+      {/* Steps */}
+      <div className="space-y-3">
+        <Label>{t("form.steps")}</Label>
+        <div className="space-y-3">
+          {stepFields.map((field, i) => (
+            <div key={field.id} className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-semibold mt-1">
+                {i + 1}
+              </div>
+              <Textarea
+                placeholder={`${t("recipe.preparation")} ${i + 1}...`}
+                rows={2}
+                className="flex-1"
+                {...register(`steps.${i}.description`)}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeStep(i)}
+                disabled={stepFields.length <= 1}
+                className="shrink-0 mt-1 text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => appendStep({ order: stepFields.length + 1, description: "" })}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          {t("form.addStep")}
+        </Button>
+      </div>
+
+      {/* Meta */}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="estimatedTime">{t("form.time")}</Label>
@@ -596,7 +390,7 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
         </div>
       </div>
 
-      {/* Categories — shared */}
+      {/* Categories */}
       <div className="space-y-2">
         <Label>{t("form.categories")} <span className="text-xs text-muted-foreground">{t("form.categoriesHint")}</span></Label>
         <Controller
@@ -632,7 +426,7 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
         {errors.categories && <p className="text-xs text-destructive">{errors.categories.message}</p>}
       </div>
 
-      {/* Suitable for — shared */}
+      {/* Suitable for */}
       <div className="space-y-2">
         <Label>{t("form.suitableFor")} <span className="text-xs text-muted-foreground">{t("form.suitableForHint")}</span></Label>
         <Controller

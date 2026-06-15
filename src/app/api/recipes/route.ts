@@ -5,6 +5,7 @@ import User from "@/models/User";
 import { uniqueSlug } from "@/lib/slugify";
 import { recipeSchema } from "@/lib/validations/recipe.schema";
 import { auth } from "@/lib/auth";
+import { translateRecipeToPortuguese } from "@/lib/translate";
 
 // POST /api/recipes — create new recipe
 // Body is JSON (image already uploaded directly to Cloudinary from the browser)
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { thumbnailUrl, thumbnailPublicId, translations, ...rest } = body;
+    const { thumbnailUrl, thumbnailPublicId, ...rest } = body;
 
     if (!thumbnailUrl || !thumbnailPublicId) {
       return NextResponse.json({ error: "Thumbnail is required" }, { status: 400 });
@@ -35,13 +36,21 @@ export async function POST(req: NextRequest) {
       return !!exists;
     });
 
+    const pt = await translateRecipeToPortuguese({
+      title: parsed.data.title,
+      description: parsed.data.description,
+      ingredients: parsed.data.ingredients.map((i) => ({ name: i.name })),
+      steps: parsed.data.steps.map((s) => ({ description: s.description })),
+      tags: parsed.data.tags,
+    });
+
     const recipe = await Recipe.create({
       ...parsed.data,
       thumbnail: { url: thumbnailUrl, publicId: thumbnailPublicId },
       slug,
       author: session.user.id,
       source: parsed.data.source?.trim() || session.user.name || null,
-      ...(translations && { translations }),
+      ...(pt && { translations: { pt } }),
     });
 
     await User.updateOne(
