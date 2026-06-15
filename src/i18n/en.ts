@@ -292,6 +292,7 @@ export const en: Record<string, string> = {
   "category.american": "American",
   "category.vegetarian": "Vegetarian",
   "category.vegan": "Vegan",
+  "category.gluten-free": "Gluten Free",
   "category.breakfast": "Breakfast",
   "category.snack": "Snack",
 };

@@ -52,7 +52,7 @@ const RecipeSchema = new Schema<RecipeDocument>(
       enum: [
         "fish", "meat", "pasta", "dessert", "soup", "salad",
         "italian", "chinese", "japanese", "mexican", "indian",
-        "american", "vegetarian", "vegan", "breakfast", "snack",
+        "american", "vegetarian", "vegan", "gluten-free", "breakfast", "snack",
       ],
       validate: {
         validator: (a: string[]) => a.length > 0,

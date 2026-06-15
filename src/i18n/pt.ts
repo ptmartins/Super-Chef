@@ -292,6 +292,7 @@ export const pt: Record<string, string> = {
   "category.american": "Americana",
   "category.vegetarian": "Vegetariana",
   "category.vegan": "Vegan",
+  "category.gluten-free": "Sem Glúten",
   "category.breakfast": "Pequeno-almoço",
   "category.snack": "Lanche",
 };

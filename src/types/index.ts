@@ -33,6 +33,7 @@ export const CATEGORIES = [
   "american",
   "vegetarian",
   "vegan",
+  "gluten-free",
   "breakfast",
   "snack",
 ] as const;

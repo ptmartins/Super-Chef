@@ -57,6 +57,7 @@ export function getCategoryColor(category: string): string {
     american: "bg-blue-100 text-blue-800",
     vegetarian: "bg-emerald-100 text-emerald-800",
     vegan: "bg-teal-100 text-teal-800",
+    "gluten-free": "bg-lime-100 text-lime-800",
     breakfast: "bg-purple-100 text-purple-800",
     snack: "bg-indigo-100 text-indigo-800",
   };
