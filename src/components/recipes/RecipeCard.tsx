@@ -13,11 +13,73 @@ interface RecipeCardProps {
   recipe: IRecipe;
   index?: number;
   isFavorited?: boolean;
+  layout?: "grid" | "list";
 }
 
-export function RecipeCard({ recipe, index = 0, isFavorited }: RecipeCardProps) {
+export function RecipeCard({ recipe, index = 0, isFavorited, layout = "grid" }: RecipeCardProps) {
   const { locale, t } = useLanguage();
   const r = localizeRecipe(recipe, locale);
+
+  if (layout === "list") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: index * 0.03 }}
+      >
+        <Link href={`/recipes/${r._id}`} className="group block">
+          <div className="rounded-2xl border bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex">
+            {/* Thumbnail */}
+            <div className="relative w-40 flex-none overflow-hidden bg-muted">
+              <Image
+                src={r.thumbnail.url}
+                alt={r.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="160px"
+              />
+              {isFavorited !== undefined && (
+                <FavoriteButton recipeId={r._id} initialFavorited={isFavorited} />
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0 p-4 flex flex-col justify-between">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 flex-1">
+                    {r.title}
+                  </h3>
+                  <span className={cn(
+                    "shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border bg-white/90",
+                    getDifficultyColor(r.difficulty)
+                  )}>
+                    <ChefHat className="h-3 w-3" />
+                    {t(`difficulty.${r.difficulty}`)}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{r.description}</p>
+              </div>
+              <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  {formatTime(r.estimatedTime)}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" />
+                  {r.servings} {t("recipes.servings")}
+                </span>
+                <span className="ml-auto flex items-center gap-1 min-w-0">
+                  <UserRound className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{r.author?.name ?? t("recipes.system")}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

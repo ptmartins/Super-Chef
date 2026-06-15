@@ -11,9 +11,10 @@ interface RecipeGridProps {
   recipes: IRecipe[];
   favoritedIds?: Set<string>;
   view?: string;
+  layout?: "grid" | "list";
 }
 
-export function RecipeGrid({ recipes, favoritedIds, view }: RecipeGridProps) {
+export function RecipeGrid({ recipes, favoritedIds, view, layout = "grid" }: RecipeGridProps) {
   const t = useTranslation();
 
   if (recipes.length === 0) {
@@ -46,13 +47,14 @@ export function RecipeGrid({ recipes, favoritedIds, view }: RecipeGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className={layout === "list" ? "flex flex-col gap-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"}>
       {recipes.map((recipe, i) => (
         <RecipeCard
           key={recipe._id}
           recipe={recipe}
           index={i}
           isFavorited={favoritedIds ? favoritedIds.has(recipe._id) : undefined}
+          layout={layout}
         />
       ))}
     </div>

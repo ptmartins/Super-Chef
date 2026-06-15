@@ -1,5 +1,4 @@
 export const dynamic = "force-dynamic";
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -10,10 +9,7 @@ import User from "@/models/User";
 import { auth } from "@/lib/auth";
 import type { IRecipe } from "@/types";
 import { getT, type Locale } from "@/lib/i18n";
-import { RecipeGrid } from "@/components/recipes/RecipeGrid";
-import { RecipeFilters } from "@/components/recipes/RecipeFilters";
-import { RecipePagination } from "@/components/recipes/RecipePagination";
-import { RecipeGridSkeleton } from "@/components/common/LoadingSpinner";
+import { RecipesView } from "@/components/recipes/RecipesView";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Recipes" };
@@ -135,31 +131,14 @@ export default async function RecipesPage({ searchParams }: PageProps) {
         </Button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar filters */}
-        <aside className="lg:w-64 shrink-0">
-          <div className="rounded-2xl border bg-card p-5 sticky top-20">
-            <p className="text-sm font-semibold mb-4">{t("recipes.filterRecipes")}</p>
-            <Suspense>
-              <RecipeFilters />
-            </Suspense>
-          </div>
-        </aside>
-
-        {/* Main content */}
-        <div className="flex-1 min-w-0 space-y-6">
-          <Suspense fallback={<RecipeGridSkeleton />}>
-            <RecipeGrid
-              recipes={recipes}
-              favoritedIds={session?.user ? favoritedIds : undefined}
-              view={view}
-            />
-          </Suspense>
-          <Suspense>
-            <RecipePagination page={page} totalPages={totalPages} total={total} />
-          </Suspense>
-        </div>
-      </div>
+      <RecipesView
+        recipes={recipes}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        favoritedIds={session?.user ? [...favoritedIds] : undefined}
+        view={view}
+      />
     </div>
   );
 }
