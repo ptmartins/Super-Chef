@@ -99,7 +99,7 @@ export function PantryManager() {
   const ingredientSuggestions = commonIngredients[locale as Locale] ?? commonIngredients.en;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-display font-bold">{t("pantry.title")}</h1>

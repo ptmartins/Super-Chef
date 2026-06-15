@@ -53,7 +53,7 @@ export default async function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-background to-amber-50/30 dark:from-orange-950/40 dark:via-background dark:to-amber-950/20 border-b">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <ChefHat className="h-4 w-4" />
@@ -92,7 +92,7 @@ export default async function Home() {
 
       {/* Features */}
       <section className="py-16 md:py-24 bg-background">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold">{t("home.features.title")}</h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
@@ -116,7 +116,7 @@ export default async function Home() {
       {/* Latest recipes */}
       {latestRecipes.length > 0 && (
         <section className="py-16 bg-muted/30 border-t">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl md:text-3xl font-display font-bold">{t("home.latestRecipes")}</h2>
               <Button asChild variant="outline" size="sm">
@@ -158,7 +158,7 @@ export default async function Home() {
 
       {/* CTA */}
       <section className="py-16 md:py-20 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold">{t("home.cta.title")}</h2>
           <p className="mt-4 text-primary-foreground/80 max-w-md mx-auto">
             {t("home.cta.desc")}

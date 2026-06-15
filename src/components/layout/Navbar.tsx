@@ -31,7 +31,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group" onClick={() => setOpen(false)}>
@@ -44,7 +44,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {links.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
@@ -120,7 +120,7 @@ export function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setOpen(!open)}
-              className="md:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
+              className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl border border-border hover:bg-muted transition-colors"
               aria-label={t("nav.toggleMenu")}
             >
               {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -136,7 +136,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border/40 bg-background"
+            className="lg:hidden border-t border-border/40 bg-background"
           >
             <nav className="flex flex-col gap-1 p-4">
               {links.map(({ href, label, icon: Icon }) => (

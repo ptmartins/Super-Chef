@@ -48,7 +48,7 @@ export default async function MenuDetailPage({ params }: PageProps) {
   const numDays = getMenuDays(menu.type);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Back */}
       <Button asChild variant="ghost" size="sm" className="mb-6 -ml-2">
         <Link href="/menus">

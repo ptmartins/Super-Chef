@@ -46,7 +46,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     // Normalise source: empty string → null so the detail page can show/hide it correctly
     update.source = update.source?.trim() || null;
-    console.log(`[PUT /api/recipes/${id}] source received:`, JSON.stringify(update.source));
 
     // Claim authorless (legacy) recipe for the editing user
     if (!existing.author) {
