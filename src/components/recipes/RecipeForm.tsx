@@ -3,13 +3,14 @@ import { useState, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, GripVertical, Upload, Loader2, Info } from "lucide-react";
+import { Plus, Trash2, GripVertical, Upload, Loader2, Info, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { IngredientAutocomplete } from "@/components/ui/IngredientAutocomplete";
 import { TagInput } from "@/components/ui/TagInput";
 import { recipeSchema, type RecipeFormData } from "@/lib/validations/recipe.schema";
@@ -35,11 +36,18 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [importOpen, setImportOpen] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importedThumbnailUrl, setImportedThumbnailUrl] = useState<string | null>(null);
+
   const {
     register,
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<RecipeFormData>({
     resolver: zodResolver(recipeSchema),
@@ -157,8 +165,91 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
     }
   };
 
+  const handleImport = async () => {
+    const currentTitle = watch("title");
+    if (currentTitle && !window.confirm(t("import.confirmOverwrite"))) return;
+
+    setImportLoading(true);
+    setImportError(null);
+    try {
+      const res = await fetch("/api/recipes/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: importUrl }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? t("import.failed"));
+
+      const { data } = json;
+      reset({
+        title: data.title ?? "",
+        description: data.description ?? "",
+        ingredients: data.ingredients?.length ? data.ingredients : [{ name: "", amount: 1, unit: "g" }],
+        steps: data.steps?.length ? data.steps : [{ order: 1, description: "" }],
+        estimatedTime: data.estimatedTime ?? 30,
+        difficulty: data.difficulty ?? "medium",
+        categories: data.categories ?? [],
+        servings: data.servings ?? 4,
+        tags: data.tags ?? [],
+        suitableFor: data.suitableFor?.length ? data.suitableFor : ["lunch", "dinner"],
+        source: data.source ?? "",
+      });
+      if (data.thumbnailUrl) setImportedThumbnailUrl(data.thumbnailUrl);
+      setImportOpen(false);
+      setImportUrl("");
+      toast({ title: t("import.success") });
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : t("import.failed"));
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {/* Import from URL dialog */}
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("import.title")}</DialogTitle>
+            <DialogDescription>{t("import.description")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="import-url">{t("import.urlLabel")}</Label>
+              <Input
+                id="import-url"
+                type="url"
+                placeholder={t("import.urlPlaceholder")}
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleImport(); } }}
+                disabled={importLoading}
+              />
+            </div>
+            {importError && <p className="text-sm text-destructive">{importError}</p>}
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => { setImportOpen(false); setImportError(null); }} disabled={importLoading}>
+                {t("import.cancel")}
+              </Button>
+              <Button type="button" onClick={handleImport} disabled={importLoading || !importUrl.trim()}>
+                {importLoading ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("import.importing")}</>
+                ) : t("import.submit")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import button */}
+      <div className="flex justify-end">
+        <Button type="button" variant="outline" size="sm" onClick={() => { setImportError(null); setImportOpen(true); }}>
+          <Link className="h-4 w-4 mr-2" />
+          {t("import.button")}
+        </Button>
+      </div>
+
       {/* Thumbnail */}
       <div className="space-y-2">
         <Label>{t("form.recipePhoto")}</Label>
@@ -185,6 +276,15 @@ export function RecipeForm({ recipe, authorName = "" }: RecipeFormProps) {
           )}
         </div>
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+        {importedThumbnailUrl && !thumbnailFile && (
+          <div className="flex items-start gap-3 rounded-lg border border-dashed p-3 bg-muted/40">
+            <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={importedThumbnailUrl} alt="Suggested thumbnail" className="h-full w-full object-cover" />
+            </div>
+            <p className="text-xs text-muted-foreground pt-1">{t("import.thumbnailNote")}</p>
+          </div>
+        )}
       </div>
 
       {/* Title & Description */}

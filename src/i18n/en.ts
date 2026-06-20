@@ -79,6 +79,20 @@ export const en: Record<string, string> = {
   "recipe.addedBy": "Added by",
   "recipe.source": "Source",
 
+  // Recipe import from URL
+  "import.button": "Import from URL",
+  "import.title": "Import Recipe from URL",
+  "import.description": "Paste a link to any recipe page. We'll extract the title, ingredients, and steps automatically.",
+  "import.urlLabel": "Recipe URL",
+  "import.urlPlaceholder": "https://www.allrecipes.com/recipe/...",
+  "import.submit": "Import Recipe",
+  "import.importing": "Importing...",
+  "import.success": "Recipe imported! Review the fields below and add a photo.",
+  "import.failed": "Failed to import recipe. Please try again.",
+  "import.thumbnailNote": "Suggested thumbnail from source — download and upload it above.",
+  "import.cancel": "Cancel",
+  "import.confirmOverwrite": "This will replace your current form data. Continue?",
+
   // Recipe empty states
   "recipe.empty.noFavorites": "No favorites yet",
   "recipe.empty.noFavoritesDesc": "Heart a recipe to save it here for quick access.",
